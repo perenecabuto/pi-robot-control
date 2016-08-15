@@ -1,0 +1,84 @@
+<html>
+<head>
+    <style>
+    .controls {
+        width: 350px;
+        text-align: center;
+        vertical-align: middle;
+        border-radius: 20px;
+        border: 1px dashed #eee;
+        padding: 10px;
+        margin: 10px;
+    }
+
+    .controls button {
+        background: transparent;
+        border: 1px solid #eee;
+        margin: 0 10px 10px 0;
+        border-radius: 5px;
+        background: #e55;
+        text-align: center;
+        padding: 5px;
+        width: 50px;
+        color: #fff;
+    }
+    </style>
+
+    <script>
+    function get(url) {
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", url, true);
+        xhr.send();
+    }
+
+    function move(action) {
+        get(location.origin + "/move/?direction=" + action);
+    }
+
+    window.document.addEventListener("keydown", function(event) {
+        switch (event.key) {
+        case "ArrowLeft":
+            move("left");
+            break;
+        case "ArrowRight":
+            move("right");
+            break;
+        case "ArrowUp":
+            move("forward");
+            break;
+        case "ArrowDown":
+            move("backward");
+            break;
+        }
+    });
+
+    window.document.addEventListener("keyup", function(event) {
+        move("stop");
+    });
+
+    window.addEventListener("DOMContentLoaded", function(event) {
+        var camera = document.getElementById("camera");
+        var origin = location.origin.replace(/:\d+/, "");
+        camera.src = origin + ':8080/?action=stream';
+    }, false);
+    </script>
+
+</head>
+
+<body>
+    <div class="controls">
+        <img id="camera" src="" />
+    </div>
+
+    <div class="controls">
+        <button onclick="move('forward')">up</button>
+        <br />
+        <button onclick="move('left')">left</button>
+        <button onclick="move('stop')">stop</button>
+        <button onclick="move('right')">right</button>
+        <br />
+        <button onclick="move('backward')">down</button>
+        <br />
+    </div>
+</body>
+</html>
