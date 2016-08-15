@@ -62,19 +62,12 @@
     window.document.addEventListener("keyup", function(event) {
         move("stop");
     });
-
-    window.addEventListener("DOMContentLoaded", function(event) {
-        var camera = document.getElementById("camera");
-        var origin = location.origin.replace(/:\d+/, "");
-        camera.src = origin + ':8080/?action=stream';
-    }, false);
     </script>
-
 </head>
 
 <body>
     <div class="controls">
-        <img id="camera" src="" />
+        <img src="/camera" />
     </div>
 
     <div class="controls">
