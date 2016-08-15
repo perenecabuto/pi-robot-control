@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"log"
 	"reflect"
 	"strings"
 
@@ -25,18 +26,18 @@ func NewWebcamCapture(timeout uint32, address string) *WebcamCapture {
 func (w WebcamCapture) Listen(onFrame func([]byte)) {
 	cam, err := webcam.Open(w.address) // Open webcam
 	if err != nil {
-		panic(err.Error())
+		log.Panic(err.Error())
 	}
 	defer cam.Close()
 
 	setupCamImageFormat(cam)
 	if err != nil {
-		panic(err.Error())
+		log.Panic(err.Error())
 	}
 
 	err = cam.StartStreaming()
 	if err != nil {
-		panic(err.Error())
+		log.Panic(err.Error())
 	}
 
 	for {
@@ -45,14 +46,14 @@ func (w WebcamCapture) Listen(onFrame func([]byte)) {
 			if reflect.TypeOf(err).Name() == "*webcam.Timeout" {
 				continue
 			}
-			panic(err.Error())
+			log.Panic(err.Error())
 		}
 
 		frame, err := cam.ReadFrame()
 		if len(frame) != 0 {
 			onFrame(frame)
 		} else if err != nil {
-			panic(err.Error())
+			log.Panic(err.Error())
 		}
 	}
 }
