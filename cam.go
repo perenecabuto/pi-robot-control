@@ -30,7 +30,7 @@ func (w WebcamCapture) Listen(onFrame func([]byte)) {
 	}
 	defer cam.Close()
 
-	setupCamImageFormat(cam)
+	err = setupCamImageFormat(cam)
 	if err != nil {
 		log.Panic(err.Error())
 	}
@@ -60,8 +60,11 @@ func (w WebcamCapture) Listen(onFrame func([]byte)) {
 
 func setupCamImageFormat(cam *webcam.Webcam) error {
 	var format webcam.PixelFormat
+	log.Println("Supported formats:", cam.GetSupportedFormats())
+
 	for f, name := range cam.GetSupportedFormats() {
 		if strings.Contains(name, "JPEG") {
+			log.Println("Camera JPEG format found:", name)
 			format = f
 			break
 		}
@@ -69,6 +72,8 @@ func setupCamImageFormat(cam *webcam.Webcam) error {
 	if format == 0 {
 		return errors.New("No format found")
 	}
+
+	log.Println("Camera dimensions:", cam.GetSupportedFrameSizes(format))
 
 	_, _, _, err := cam.SetImageFormat(format, IMAGE_WIDTH, IMAGE_HEIGHT)
 	return err
