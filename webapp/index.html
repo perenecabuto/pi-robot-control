@@ -121,6 +121,23 @@
         get(location.origin + "/move/?direction=" + action);
     }
 
+    function bindMove(el, action) {
+        var startfn = function(e) {
+            move(action);
+            e.preventDefault();
+        };
+        var stopfn = function(e) {
+            el.blur();
+            move('stop');
+            e.preventDefault();
+        };
+
+        el.addEventListener("mousedown", startfn, false);
+        el.addEventListener("touchstart", startfn, false);
+        el.addEventListener("mouseup", stopfn, false);
+        el.addEventListener("touchend", stopfn, false);
+    }
+
     window.document.addEventListener("keydown", function(event) {
         switch (event.key) {
         case "ArrowLeft":
@@ -142,11 +159,6 @@
         move("stop");
     });
 
-    window.document.addEventListener("onmouseup", function() {
-        console.log("stop");
-        move("stop");
-    });
-
     window.addEventListener("DOMContentLoaded", function() {
         var fallback = function() {
             var baseURL = window.location.origin.replace(/:\d+/, "");
@@ -154,6 +166,14 @@
             document.getElementById("camera").removeEventListener("error", fallback);
         };
         document.getElementById("camera").addEventListener("error", fallback);
+
+        var buttons = document.getElementsByTagName("button");
+        for (var i = 0; i < buttons.length; i++) {
+            var b = buttons[i];
+            if (b !== undefined && b.attributes.action !== undefined) {
+                bindMove(b, b.attributes.action);
+            }
+        }
     });
     </script>
 </head>
@@ -164,13 +184,13 @@
     </div>
 
     <div class="widget-container controls-container">
-        <button onmousedown="move('forward')" onmouseup="move('stop'); this.blur()">&#x2191;</button>
+        <button action="forward">&#x2191;</button>
         <br />
-        <button onmousedown="move('left')" onmouseup="move('stop'); this.blur()">&#x2190;</button>
-        <button onmouseup="move('stop'); this.blur()">stop</button>
-        <button onmousedown="move('right')" onmouseup="move('stop'); this.blur()">&#x2192;</button>
+        <button action="left">&#x2190;</button>
+        <button action="right">stop</button>
+        <button action="backward">&#x2192;</button>
         <br />
-        <button onmousedown="move('backward')" onmouseup="move('stop'); this.blur()">&#x2193;</button>
+        <button action="backward">&#x2193;</button>
         <br />
     </div>
 </body>
