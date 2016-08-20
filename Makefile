@@ -19,11 +19,11 @@ deploy: cross
 
 .PHONY=stop
 stop:
-	ssh $(USER)@$(HOST) "killall -9 robot_control"
+	ssh $(USER)@$(HOST) "eval killall -9 robot-control; echo 1"
 
 .PHONY=start
-start: deploy stop
-	ssh $(USER)@$(HOST) "cd $(DEPLOY_DIR); nohup ./robot_control &"
+start: stop
+	ssh $(USER)@$(HOST) "cd $(DEPLOY_DIR) && nohup ./robot-control && disown"
 
 .PHONY=deps
 deps:
