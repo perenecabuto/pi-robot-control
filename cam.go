@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"log"
-	"reflect"
 	"strings"
 
 	"github.com/blackjack/webcam"
@@ -43,10 +42,12 @@ func (w WebcamCapture) Listen(onFrame func([]byte)) {
 	for {
 		err = cam.WaitForFrame(w.timeout)
 		if err != nil {
-			if reflect.TypeOf(err).Name() == "*webcam.Timeout" {
+			switch err.(type) {
+			case *webcam.Timeout:
 				continue
+			default:
+				log.Panic(err.Error())
 			}
-			log.Panic(err.Error())
 		}
 
 		frame, err := cam.ReadFrame()
