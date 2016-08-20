@@ -16,13 +16,14 @@ const (
 type WebcamCapture struct {
 	timeout uint32
 	address string
+	cam     *webcam.Webcam
 }
 
 func NewWebcamCapture(timeout uint32, address string) *WebcamCapture {
-	return &WebcamCapture{timeout, address}
+	return &WebcamCapture{timeout, address, nil}
 }
 
-func (w WebcamCapture) Listen(onFrame func([]byte)) (err error) {
+func (w *WebcamCapture) Initialize() (err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			switch x := r.(type) {
@@ -40,8 +41,6 @@ func (w WebcamCapture) Listen(onFrame func([]byte)) (err error) {
 	if err != nil {
 		log.Panic(err.Error())
 	}
-	defer cam.Close()
-
 	err = setupCamImageFormat(cam)
 	if err != nil {
 		log.Panic(err.Error())
@@ -50,23 +49,34 @@ func (w WebcamCapture) Listen(onFrame func([]byte)) (err error) {
 	if err != nil {
 		log.Panic(err.Error())
 	}
+	w.cam = cam
+	return nil
+}
+
+func (w WebcamCapture) Listen(onFrame func([]byte)) error {
+	if w.cam == nil {
+		if err := w.Initialize(); err != nil {
+			return err
+		}
+	}
+	defer w.cam.Close()
 
 	for {
-		err = cam.WaitForFrame(w.timeout)
+		err := w.cam.WaitForFrame(w.timeout)
 		if err != nil {
 			switch err.(type) {
 			case *webcam.Timeout:
 				continue
 			default:
-				log.Panic(err.Error())
+				return err
 			}
 		}
 
-		frame, err := cam.ReadFrame()
+		frame, err := w.cam.ReadFrame()
 		if len(frame) != 0 {
 			onFrame(frame)
 		} else if err != nil {
-			log.Panic(err.Error())
+			return err
 		}
 	}
 }
