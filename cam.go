@@ -46,7 +46,6 @@ func (w WebcamCapture) Listen(onFrame func([]byte)) (err error) {
 	if err != nil {
 		log.Panic(err.Error())
 	}
-
 	err = cam.StartStreaming()
 	if err != nil {
 		log.Panic(err.Error())
