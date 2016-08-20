@@ -9,13 +9,13 @@ type Robot struct {
 	pin2B rpio.Pin
 }
 
-func NewRobot(gpio1F, gpio2F, gpio1B, gpio2B uint8) (*Robot, error) {
+func NewRobot(gpio1F, gpio2F, gpio1B, gpio2B uint8) *Robot {
 	pin1F := rpio.Pin(gpio1F)
 	pin2F := rpio.Pin(gpio2F)
 	pin1B := rpio.Pin(gpio1B)
 	pin2B := rpio.Pin(gpio2B)
 
-	return &Robot{pin1F, pin2F, pin1B, pin2B}, nil
+	return &Robot{pin1F, pin2F, pin1B, pin2B}
 }
 
 func (r Robot) Initialize() error {
