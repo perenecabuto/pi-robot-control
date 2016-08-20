@@ -8,6 +8,8 @@ import (
 )
 
 var (
+	FrameTimeout  = 1000
+	CameraDevice  = "/dev/video0"
 	ServerAddress = "0.0.0.0:8000"
 )
 
@@ -15,20 +17,20 @@ func main() {
 	robot := NewRobot(17, 27, 4, 22)
 	robotHandler := NewRobotHandler(robot)
 	stream := mjpeg.NewStream()
-	capture := NewWebcamCapture(1000, "/dev/video0")
+	capture := NewWebcamCapture(uint32(FrameTimeout), CameraDevice)
 
-	http.Handle("/camera", stream)
 	http.Handle("/move/", robotHandler)
 	http.HandleFunc("/", IndexHandler)
 
-	go func() {
-		err := capture.Listen(func(frame []byte) {
+	err := capture.Initialize()
+	if err == nil {
+		http.Handle("/camera", stream)
+		go capture.Listen(func(frame []byte) {
 			stream.UpdateJPEG(frame)
 		})
-		if err != nil {
-			log.Println(err)
-		}
-	}()
+	} else {
+		log.Println("Error starting camera:", err)
+	}
 
 	go robot.Initialize()
 	log.Println("Starting server on:", ServerAddress)
