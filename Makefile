@@ -1,6 +1,7 @@
 HOST := rastejante.local
 USER := pi
 DEPLOY_DIR := ~/robot-control
+CFLAGS := "-ljpeg"
 
 
 .PHONY=build

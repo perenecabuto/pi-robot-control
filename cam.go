@@ -1,9 +1,7 @@
 package main
 
 import (
-	"errors"
 	"log"
-	"reflect"
 	"strings"
 
 	"github.com/blackjack/webcam"
@@ -30,10 +28,11 @@ func (w WebcamCapture) Listen(onFrame func([]byte)) {
 	}
 	defer cam.Close()
 
-	err = setupCamImageFormat(cam)
+	format, err := setupCamImageFormat(cam)
 	if err != nil {
 		log.Panic(err.Error())
 	}
+	log.Println("Chosen format:", format)
 
 	err = cam.StartStreaming()
 	if err != nil {
@@ -43,38 +42,53 @@ func (w WebcamCapture) Listen(onFrame func([]byte)) {
 	for {
 		err = cam.WaitForFrame(w.timeout)
 		if err != nil {
-			if reflect.TypeOf(err).Name() == "*webcam.Timeout" {
+			switch err.(type) {
+			case *webcam.Timeout:
 				continue
+			default:
+				log.Panic(err.Error())
 			}
-			log.Panic(err.Error())
 		}
 
 		frame, err := cam.ReadFrame()
-		if len(frame) != 0 {
-			onFrame(frame)
-		} else if err != nil {
+		if err != nil {
 			log.Panic(err.Error())
+		}
+		if len(frame) != 0 {
+			var jpegFrame []byte
+			if format.IsJPEG() {
+				jpegFrame = frame
+			} else {
+				jpegFrame, err = CompressImageToJpeg(frame)
+				if err != nil {
+					log.Panic(err.Error())
+				}
+			}
+			onFrame(jpegFrame)
 		}
 	}
 }
 
-func setupCamImageFormat(cam *webcam.Webcam) error {
-	var format webcam.PixelFormat
+type PixelFormatName string
+
+func (n PixelFormatName) IsJPEG() bool {
+	return strings.Contains(string(n), "JPEG")
+}
+
+func setupCamImageFormat(cam *webcam.Webcam) (PixelFormatName, error) {
 	log.Println("Supported formats:", cam.GetSupportedFormats())
 
-	for f, name := range cam.GetSupportedFormats() {
-		if strings.Contains(name, "JPEG") {
+	var format webcam.PixelFormat
+	var name PixelFormatName
+	for f, n := range cam.GetSupportedFormats() {
+		format, name = f, PixelFormatName(n)
+		if name.IsJPEG() {
 			log.Println("Camera JPEG format found:", name)
-			format = f
 			break
 		}
 	}
-	if format == 0 {
-		return errors.New("No format found")
-	}
 
 	log.Println("Camera dimensions:", cam.GetSupportedFrameSizes(format))
-
 	_, _, _, err := cam.SetImageFormat(format, IMAGE_WIDTH, IMAGE_HEIGHT)
-	return err
+	return name, err
 }
