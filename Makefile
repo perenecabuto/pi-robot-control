@@ -8,7 +8,7 @@ build:
 	go build
 
 .PHONY=cross
-cross: deps
+cross:
 	CGO_ENABLED=1 CC=arm-linux-gnueabi-gcc GOOS=linux GOARCH=arm go build -v
 
 .PHONY=deploy
