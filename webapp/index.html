@@ -1,6 +1,6 @@
 <html>
 <head>
-    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=0.9, user-scalable=no">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=0.9, maximum-scale=0.9, minimum-scale=0.9,user-scalable=0">
     <style>
     body {
         margin: auto;
@@ -134,6 +134,7 @@
         el.addEventListener("touchstart", startfn, false);
         el.addEventListener("mouseup", stopfn, false);
         el.addEventListener("touchend", stopfn, false);
+        el.addEventListener("touchcancel", stopfn, false);
     }
 
     window.document.addEventListener("keydown", function(event) {
@@ -169,7 +170,7 @@
         for (var i = 0; i < buttons.length; i++) {
             var b = buttons[i];
             if (b !== undefined && b.attributes.action !== undefined) {
-                bindMove(b, b.attributes.action);
+                bindMove(b, b.attributes.action.value);
             }
         }
     });
@@ -185,8 +186,8 @@
         <button action="forward">&#x2191;</button>
         <br />
         <button action="left">&#x2190;</button>
-        <button action="right">stop</button>
-        <button action="backward">&#x2192;</button>
+        <button action="stop">stop</button>
+        <button action="right">&#x2192;</button>
         <br />
         <button action="backward">&#x2193;</button>
         <br />
