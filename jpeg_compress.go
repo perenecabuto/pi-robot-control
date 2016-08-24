@@ -7,8 +7,11 @@ package main
 import "C"
 import "unsafe"
 
-func CompressImageToJpeg(frame []byte) ([]byte, error) {
+func CompressImageToJpeg(frame []byte, width uint32, height uint32) ([]byte, error) {
 	jpeg := make([]byte, len(frame), len(frame))
-	C.compressYUYVtoJPEG((*C.char)(unsafe.Pointer(&frame[0])), (*C.char)(unsafe.Pointer(&jpeg[0])), 480, 480)
+	C.compressYUYVtoJPEG(
+		(*C.uint8_t)(unsafe.Pointer(&frame[0])), (*C.uint8_t)(unsafe.Pointer(&jpeg[0])),
+		(C.uint32_t)(width), (C.uint32_t)(height),
+	)
 	return jpeg, nil
 }

@@ -7,11 +7,6 @@ import (
 	"github.com/blackjack/webcam"
 )
 
-const (
-	IMAGE_WIDTH  = 480
-	IMAGE_HEIGHT = 480
-)
-
 type WebcamCapture struct {
 	timeout uint32
 	address string
@@ -59,7 +54,7 @@ func (w WebcamCapture) Listen(onFrame func([]byte)) {
 			if format.IsJPEG() {
 				jpegFrame = frame
 			} else {
-				jpegFrame, err = CompressImageToJpeg(frame)
+				jpegFrame, err = CompressImageToJpeg(frame, format.Width, format.Height)
 				if err != nil {
 					log.Panic(err.Error())
 				}
@@ -69,26 +64,34 @@ func (w WebcamCapture) Listen(onFrame func([]byte)) {
 	}
 }
 
-type PixelFormatName string
-
-func (n PixelFormatName) IsJPEG() bool {
-	return strings.Contains(string(n), "JPEG")
+type CamPixelFormat struct {
+	Name   string
+	Width  uint32
+	Height uint32
 }
 
-func setupCamImageFormat(cam *webcam.Webcam) (PixelFormatName, error) {
+func (f CamPixelFormat) IsJPEG() bool {
+	return strings.Contains(f.Name, "JPEG")
+}
+
+func setupCamImageFormat(cam *webcam.Webcam) (*CamPixelFormat, error) {
 	log.Println("Supported formats:", cam.GetSupportedFormats())
 
 	var format webcam.PixelFormat
-	var name PixelFormatName
+	var found *CamPixelFormat
 	for f, n := range cam.GetSupportedFormats() {
-		format, name = f, PixelFormatName(n)
-		if name.IsJPEG() {
-			log.Println("Camera JPEG format found:", name)
+		format, found = f, &CamPixelFormat{Name: n}
+		if found.IsJPEG() {
+			log.Println("Camera JPEG format found:", found)
 			break
 		}
 	}
 
-	log.Println("Camera dimensions:", cam.GetSupportedFrameSizes(format))
-	_, _, _, err := cam.SetImageFormat(format, IMAGE_WIDTH, IMAGE_HEIGHT)
-	return name, err
+	supportedSizes := cam.GetSupportedFrameSizes(format)
+	size := supportedSizes[0]
+
+	found.Width, found.Height = size.MaxWidth, size.MaxHeight
+	_, _, _, err := cam.SetImageFormat(format, found.Width, found.Height)
+
+	return found, err
 }
