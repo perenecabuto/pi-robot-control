@@ -8,11 +8,6 @@ import (
 	"github.com/blackjack/webcam"
 )
 
-const (
-	IMAGE_WIDTH  = 480
-	IMAGE_HEIGHT = 480
-)
-
 type WebcamCapture struct {
 	timeout uint32
 	address string
@@ -41,10 +36,14 @@ func (w *WebcamCapture) Initialize() (err error) {
 	if err != nil {
 		log.Panic(err.Error())
 	}
-	err = setupCamImageFormat(cam)
+	defer cam.Close()
+
+	format, err := setupCamImageFormat(cam)
 	if err != nil {
 		log.Panic(err.Error())
 	}
+	log.Println("Chosen format:", format)
+
 	err = cam.StartStreaming()
 	if err != nil {
 		log.Panic(err.Error())
@@ -78,26 +77,49 @@ func (w WebcamCapture) Listen(onFrame func([]byte)) error {
 		} else if err != nil {
 			return err
 		}
+		if len(frame) != 0 {
+			var jpegFrame []byte
+			if format.IsJPEG() {
+				jpegFrame = frame
+			} else {
+				jpegFrame, err = CompressImageToJpeg(frame, format.Width, format.Height)
+				if err != nil {
+					return err
+				}
+			}
+			onFrame(jpegFrame)
+		}
 	}
 }
 
-func setupCamImageFormat(cam *webcam.Webcam) error {
-	var format webcam.PixelFormat
+type CamPixelFormat struct {
+	Name   string
+	Width  uint32
+	Height uint32
+}
+
+func (f CamPixelFormat) IsJPEG() bool {
+	return strings.Contains(f.Name, "JPEG")
+}
+
+func setupCamImageFormat(cam *webcam.Webcam) (*CamPixelFormat, error) {
 	log.Println("Supported formats:", cam.GetSupportedFormats())
 
-	for f, name := range cam.GetSupportedFormats() {
-		if strings.Contains(name, "JPEG") {
-			log.Println("Camera JPEG format found:", name)
-			format = f
+	var format webcam.PixelFormat
+	var found *CamPixelFormat
+	for f, n := range cam.GetSupportedFormats() {
+		format, found = f, &CamPixelFormat{Name: n}
+		if found.IsJPEG() {
+			log.Println("Camera JPEG format found:", found)
 			break
 		}
 	}
-	if format == 0 {
-		return errors.New("No format found")
-	}
 
-	log.Println("Camera dimensions:", cam.GetSupportedFrameSizes(format))
+	supportedSizes := cam.GetSupportedFrameSizes(format)
+	size := supportedSizes[0]
 
-	_, _, _, err := cam.SetImageFormat(format, IMAGE_WIDTH, IMAGE_HEIGHT)
-	return err
+	found.Width, found.Height = size.MaxWidth, size.MaxHeight
+	_, _, _, err := cam.SetImageFormat(format, found.Width, found.Height)
+
+	return found, err
 }
