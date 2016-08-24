@@ -22,17 +22,16 @@ func main() {
 	http.Handle("/move/", robotHandler)
 	http.HandleFunc("/", IndexHandler)
 
-	err := capture.Initialize()
-	if err == nil {
-		http.Handle("/camera", stream)
-		go capture.Listen(func(frame []byte) {
+	http.Handle("/camera", stream)
+	go func() {
+		err := capture.Listen(func(frame []byte) {
 			stream.UpdateJPEG(frame)
 		})
-	} else {
-		log.Println("Error starting camera:", err)
-	}
+		if err != nil {
+			log.Println("Error starting camera:", err)
+		}
+	}()
 
-	go robot.Initialize()
 	log.Println("Starting server on:", ServerAddress)
 	log.Panic(http.ListenAndServe(ServerAddress, nil))
 }
