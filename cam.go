@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"log"
+	"sort"
 	"strings"
 
 	"github.com/blackjack/webcam"
@@ -71,6 +72,20 @@ func (f CamPixelFormat) IsJPEG() bool {
 	return strings.Contains(f.Name, "JPEG")
 }
 
+type SortedSizes []webcam.FrameSize
+
+func (s SortedSizes) Len() int {
+	return len(s)
+}
+
+func (s SortedSizes) Less(i, j int) bool {
+	return s[i].MaxWidth < s[j].MaxWidth
+}
+
+func (s SortedSizes) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
+}
+
 func setupCamImageFormat(cam *webcam.Webcam) (*CamPixelFormat, error) {
 	log.Println("Supported formats:", cam.GetSupportedFormats())
 
@@ -87,8 +102,9 @@ func setupCamImageFormat(cam *webcam.Webcam) (*CamPixelFormat, error) {
 		return nil, errors.New("No pixel format found")
 	}
 
-	supportedSizes := cam.GetSupportedFrameSizes(format)
-	log.Println("->", format, supportedSizes)
+	supportedSizes := SortedSizes(cam.GetSupportedFrameSizes(format))
+	log.Println("Supported sizes:", supportedSizes)
+	sort.Sort(supportedSizes)
 	size := supportedSizes[0]
 
 	found.Width, found.Height = size.MaxWidth, size.MaxHeight
