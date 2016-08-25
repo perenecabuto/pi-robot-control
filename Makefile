@@ -4,14 +4,17 @@ DEPLOY_DIR := ~/robot-control
 
 VENDOR_DIR := $(PWD)/vendor
 LIBJPEG_DIR := $(VENDOR_DIR)/libjpeg
-LIBJPEG_SRC_NAME := libjpeg-turbo-1.5.0
-LIBJPEG_INSTALL_DIR := $(VENDOR_DIR)/$(LIBJPEG_SRC_NAME)/opt/libjpeg-turbo
-LIBJPEG_SRC_DIR := libjpeg-turbo-1.5.0
-LIBJPEG_SRC_TGZ := libjpeg-turbo-1.5.0.tar.gz
-LIBJPEG_SRC_URL := http://ufpr.dl.sourceforge.net/project/libjpeg-turbo/1.5.0/$(LIBJPEG_SRC_TGZ)
+LIBJPEG_SRC_NAME := jpeg-9
+#LIBJPEG_SRC_NAME := libjpeg-turbo-1.5.0
+LIBJPEG_INSTALL_DIR := $(VENDOR_DIR)/$(LIBJPEG_SRC_NAME)/usr/local
+#LIBJPEG_INSTALL_DIR := $(VENDOR_DIR)/$(LIBJPEG_SRC_NAME)/opt/libjpeg-turbo
+LIBJPEG_SRC_TGZ := jpegsrc.v9.tar.gz
+#LIBJPEG_SRC_TGZ := libjpeg-turbo-1.5.0.tar.gz
+LIBJPEG_SRC_URL := http://www.ijg.org/files/$(LIBJPEG_SRC_TGZ)
+#LIBJPEG_SRC_URL := http://ufpr.dl.sourceforge.net/project/libjpeg-turbo/1.5.0/$(LIBJPEG_SRC_TGZ)
 
-CFLAGS := "-I$(LIBJPEG_DIR)/include  -ljpeg"
-LDFLAGS := "-L$(LIBJPEG_DIR)/lib -Wl,-rpath=\$$ORIGIN/vendor/libjpeg/lib/"
+CFLAGS := "-I$(LIBJPEG_DIR)/include  -ljpeg -O3"
+LDFLAGS := "-L$(LIBJPEG_DIR)/lib -Wl,-rpath=\$$ORIGIN/vendor/libjpeg/lib/ -O3"
 
 
 .PHONY=build
