@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"net/http"
 
@@ -8,16 +9,17 @@ import (
 )
 
 var (
-	FrameTimeout  = 1000
-	CameraDevice  = "/dev/video0"
-	ServerAddress = "0.0.0.0:8000"
+	FrameTimeout  = flag.Int("frametimeout", 100, "Frame timeout")
+	CameraDevice  = flag.String("d", "/dev/video0", "Video dev path")
+	ServerAddress = flag.String("a", "0.0.0.0:8000", "Server address")
 )
 
 func main() {
+	flag.Parse()
 	robot := NewRobot(17, 27, 4, 22)
 	robotHandler := NewRobotHandler(robot)
 	stream := mjpeg.NewStream()
-	capture := NewWebcamCapture(uint32(FrameTimeout), CameraDevice)
+	capture := NewWebcamCapture(uint32(*FrameTimeout), *CameraDevice)
 
 	http.Handle("/move/", robotHandler)
 	http.HandleFunc("/", IndexHandler)
@@ -32,6 +34,6 @@ func main() {
 		}
 	}()
 
-	log.Println("Starting server on:", ServerAddress)
-	log.Panic(http.ListenAndServe(ServerAddress, nil))
+	log.Println("Starting server on:", *ServerAddress)
+	log.Panic(http.ListenAndServe(*ServerAddress, nil))
 }
