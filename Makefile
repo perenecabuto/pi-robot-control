@@ -1,8 +1,15 @@
 HOST := rastejante.local
 USER := pi
 DEPLOY_DIR := ~/robot-control
+
 VENDOR_DIR := $(PWD)/vendor
-LIBJPEG_DIR := $(VENDOR_DIR)/libjpeg/
+LIBJPEG_DIR := $(VENDOR_DIR)/libjpeg
+LIBJPEG_SRC_NAME := libjpeg-turbo-1.5.0
+LIBJPEG_INSTALL_DIR := $(VENDOR_DIR)/$(LIBJPEG_SRC_NAME)/opt/libjpeg-turbo
+LIBJPEG_SRC_DIR := libjpeg-turbo-1.5.0
+LIBJPEG_SRC_TGZ := libjpeg-turbo-1.5.0.tar.gz
+LIBJPEG_SRC_URL := http://ufpr.dl.sourceforge.net/project/libjpeg-turbo/1.5.0/$(LIBJPEG_SRC_TGZ)
+
 CFLAGS := "-I$(LIBJPEG_DIR)/include  -ljpeg"
 LDFLAGS := "-L$(LIBJPEG_DIR)/lib -Wl,-rpath=\$$ORIGIN/vendor/libjpeg/lib/"
 
@@ -11,12 +18,12 @@ LDFLAGS := "-L$(LIBJPEG_DIR)/lib -Wl,-rpath=\$$ORIGIN/vendor/libjpeg/lib/"
 build: libjpeg_x86 install_libjpeg
 	CGO_ENABLED=1 GOOS=linux CGO_CFLAGS=$(CFLAGS) CGO_LDFLAGS=$(LDFLAGS) go build -v
 
-.PHONY=cross
-cross: libjpeg_arm install_libjpeg
+.PHONY=cross_arm
+cross_arm: libjpeg_arm install_libjpeg
 	CGO_ENABLED=1 CC=arm-linux-gnueabi-gcc GOOS=linux GOARCH=arm CGO_CFLAGS=$(CFLAGS) CGO_LDFLAGS=$(LDFLAGS) go build -v
 
 .PHONY=deploy
-deploy: cross
+deploy: cross_arm
 	ssh $(USER)@$(HOST) "mkdir -p $(DEPLOY_DIR)"
 	ssh $(USER)@$(HOST) "mkdir -p $(DEPLOY_DIR)/vendor"
 	scp -r robot-control $(USER)@$(HOST):$(DEPLOY_DIR)
@@ -37,24 +44,24 @@ deps:
 
 .PHONY=libjpeg_arm
 libjpeg_arm: download_libjpeg
-	cd $(VENDOR_DIR)/jpeg-9 && ./configure --host=arm-linux CC=arm-linux-gnueabi-gcc
-	cd $(VENDOR_DIR)/jpeg-9 && make install DESTDIR=`pwd`
+	cd $(VENDOR_DIR)/$(LIBJPEG_SRC_NAME) && ./configure --host=arm-linux CC=arm-linux-gnueabi-gcc
+	cd $(VENDOR_DIR)/$(LIBJPEG_SRC_NAME) && make install DESTDIR=`pwd`
 
 .PHONY=libjpeg_x86
 libjpeg_x86: download_libjpeg
-	cd $(VENDOR_DIR)/jpeg-9 && ./configure
-	cd $(VENDOR_DIR)/jpeg-9 && make install DESTDIR=`pwd`
+	cd $(VENDOR_DIR)/$(LIBJPEG_SRC_NAME) && ./configure
+	cd $(VENDOR_DIR)/$(LIBJPEG_SRC_NAME) && make install DESTDIR=`pwd`
 
 .PHONY=install_libjpeg
-install_libjpeg: 
-	cd $(VENDOR_DIR)/jpeg-9 && cp -r usr/local/include/ $(LIBJPEG_DIR)
-	cd $(VENDOR_DIR)/jpeg-9 && cp -r usr/local/lib/ $(LIBJPEG_DIR)
+install_libjpeg:
+	cd $(VENDOR_DIR)/$(LIBJPEG_SRC_NAME) && cp -r $(LIBJPEG_INSTALL_DIR)/include/ $(LIBJPEG_DIR)
+	cd $(VENDOR_DIR)/$(LIBJPEG_SRC_NAME) && cp -r $(LIBJPEG_INSTALL_DIR)/lib*/ $(LIBJPEG_DIR)/lib/
 
 .PHONY=download_libjpeg
 download_libjpeg:
 	mkdir -p $(LIBJPEG_DIR)
-	cd $(VENDOR_DIR)  && wget -c http://www.ijg.org/files/jpegsrc.v9.tar.gz
-	cd $(VENDOR_DIR)  && tar -xzvf jpegsrc.v9.tar.gz
+	cd $(VENDOR_DIR)  && wget -c $(LIBJPEG_SRC_URL)
+	cd $(VENDOR_DIR)  && tar -xzf $(LIBJPEG_SRC_TGZ)
 
 .PHONY=clean
 clean:
