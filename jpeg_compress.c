@@ -1,3 +1,5 @@
+#include "jpeg_compress.h"
+
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -30,7 +32,7 @@ void compressYUYVtoJPEG(const uint8_t* const input, uint8_t* output, uint32_t wi
 
     cinfo.err = jpeg_std_error(&jerr);
     jpeg_create_compress(&cinfo);
-    jpeg_mem_dest(&cinfo, &outbuffer, &outlen);
+    jpeg_mem_dest(&cinfo, &outbuffer, (long unsigned int*)&outlen);
 
     // jrow is a libjpeg row of samples array of 1 row pointer
     cinfo.image_width = width & -1;
