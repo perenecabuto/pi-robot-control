@@ -1,25 +1,22 @@
 <html>
 <head>
-    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=0.9, maximum-scale=0.9, minimum-scale=0.9,user-scalable=0">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, maximum-scale=1, minimum-scale=1,user-scalable=0">
     <style>
     body {
-        margin: auto;
         text-align: center;
-        background: ghostwhite;
+        background: #eaeaea;
     }
     .widget-container {
-        width: 80%;
-        max-width: 250pt;
         text-align: center;
-        border-radius: 15pt;
         padding: 10pt;
-        margin: 10pt;
-        display: inline-block;
-        vertical-align: middle;
     }
     .widget-container > * {
         border: 1pt solid #eee;
         border-radius: 5pt;
+        box-shadow: 3px 3px 10px 0px rgba(0,0,0,0.65);
+    }
+    .widget-container button:active {
+        box-shadow: 3px 3px 10px 0px rgba(0,0,0,0.9);
     }
     .widget-container button {
         padding: 5pt;
@@ -27,83 +24,50 @@
         color: #fff;
         width: 40pt;
         height: 40pt;
-        margin: 0 10pt 10pt 0;
+        margin-top: 5px;
     }
     .widget-container img {
         border-radius: 8pt;
         display: block;
-        width: auto;
-        max-width: 100%;
-        min-height: 60%;
-        max-height: 100%;
         margin: auto;
+        width: 100%;
+        height: auto;
         background: url(data:image/jpeg;base64,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);
         background-size: 100%;
     }
 
     .widget-container.camera-container {
-        background: #bbd0f7;
-        border: 2pt inset #ccc;
+        position: absolute;
+        top: 0;
+        left: 0;
     }
     .widget-container.controls-container {
-        min-width: 160pt;
+        position: absolute;
+        right: 0;
+        bottom: 0;
     }
 
     @media (orientation:landscape) {
         .widget-container {
-            transform: translateY(10%);
-            display: inline-block;
-            margin: 5pt;
+            vertical-align: bottom;
         }
         .widget-container.camera-container {
-            min-width: 60%;
-        }
-        .widget-container.controls-container {
-            width: 20%;
-            min-width: 120pt;
-            border: 2pt inset #ccc;
-        }
-        .widget-container.controls-container button {
-            width: 30pt;
-            height: 30pt;
-            margin: auto;
+            max-width: 60%;
         }
         .widget-container.camera-container img {
-            height: 60%;
+            max-width: 100%;
         }
     }
 
-    @media (min-width:500pt) and (orientation:portrait) {
-    }
-
-    @media (min-height:500pt) and (min-width: 500pt) and (orientation:landscape) {
-        .widget-container.camera-container {
-            transform: translateY(10%);
-        }
-    }
-
-    @media (min-height:500pt) and (min-width: 500pt) {
-        .widget-container.controls-container {
-            width: 20%;
-            min-width: 190pt;
-        }
-        .widget-container.controls-container {
-            border: none;
-            max-width: 20%;
+    @media (min-height:504px) and (min-width: 425px), (min-height:425px) and (min-width:504px) {
+        .widget-container {
+            margin-top: 0;
         }
         .widget-container.controls-container button {
             width: 50pt;
             height: 50pt;
             margin: 5pt;
-        }
-
-        .widget-container.camera-container {
-            min-width: 60%;
-            min-height: 0%;
-            max-width: 100%;
-            max-height: 60%;
-            width: 50%;
-            vertical-align: top;
+            margin: 0 10pt 10pt 0;
         }
     }
     </style>
