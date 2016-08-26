@@ -1,12 +1,14 @@
 package device
 
-import "github.com/stianeikeland/go-rpio"
+import (
+	"github.com/stianeikeland/go-rpio"
+)
 
 type Robot struct {
-	pin1F rpio.Pin
-	pin2F rpio.Pin
-	pin1B rpio.Pin
-	pin2B rpio.Pin
+	pin1F     rpio.Pin
+	pin2F     rpio.Pin
+	pin1B     rpio.Pin
+	pin2B     rpio.Pin
 }
 
 func NewRobot(gpio1F, gpio2F, gpio1B, gpio2B uint8) *Robot {
@@ -28,38 +30,49 @@ func (r Robot) Initialize() error {
 	r.pin2F.Output()
 	r.pin1B.Output()
 	r.pin2B.Output()
-
 	r.Stop()
+
+	go func() {
+		for range r.stopTimer.C {
+			r.stopTimer.Stop()
+			r.Stop()
+		}
+	}()
+
 	return nil
 }
 
 func (r Robot) Forward() {
-	r.Stop()
-	r.pin1F.High()
-	r.pin2F.High()
+	r.move(true, true, false, false)
 }
 
 func (r Robot) Backward() {
-	r.Stop()
-	r.pin1B.High()
-	r.pin2B.High()
+	r.move(false, false, true, true)
 }
 
 func (r Robot) Left() {
-	r.Stop()
-	r.pin1F.High()
-	r.pin2B.High()
+	r.move(true, false, false, true)
 }
 
 func (r Robot) Right() {
-	r.Stop()
-	r.pin1B.High()
-	r.pin2F.High()
+	r.move(false, true, true, false)
 }
 
 func (r Robot) Stop() {
-	r.pin1F.Low()
-	r.pin2F.Low()
-	r.pin1B.Low()
-	r.pin2B.Low()
+	r.move(false, false, false, false)
+}
+
+func (r Robot) move(val1F, val2F, val1B, val2B bool) {
+	toggle(r.pin1F, val1F)
+	toggle(r.pin2F, val2F)
+	toggle(r.pin1B, val1B)
+	toggle(r.pin2B, val2B)
+}
+
+func toggle(pin rpio.Pin, on bool) {
+	if on {
+		pin.High()
+	} else {
+		pin.Low()
+	}
 }
