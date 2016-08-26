@@ -25,12 +25,15 @@ build: libjpeg_x86 install_libjpeg
 cross_arm: libjpeg_arm install_libjpeg
 	CGO_ENABLED=1 CC=arm-linux-gnueabi-gcc GOOS=linux GOARCH=arm CGO_CFLAGS=$(CFLAGS) CGO_LDFLAGS=$(LDFLAGS) go build -v
 
-.PHONY=deploy
-deploy: clean cross_arm
+.PHONY=deploy upload
+deploy: cross_arm upload
+	@echo Start deploy to $(HOST)
+
+upload:
 	ssh $(USER)@$(HOST) "mkdir -p $(DEPLOY_DIR)"
 	ssh $(USER)@$(HOST) "mkdir -p $(DEPLOY_DIR)/vendor"
-	scp -r robot-control $(USER)@$(HOST):$(DEPLOY_DIR)
 	scp -r webapp $(USER)@$(HOST):$(DEPLOY_DIR)
+	scp -r robot-control $(USER)@$(HOST):$(DEPLOY_DIR)
 	scp -r $(LIBJPEG_DIR) $(USER)@$(HOST):$(DEPLOY_DIR)/vendor
 
 .PHONY=stop
