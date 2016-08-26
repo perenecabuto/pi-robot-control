@@ -26,8 +26,9 @@ func main() {
 	stream := handler.NewMJPEGStream(*FPS)
 	robotHandler := handler.NewRobotHandler(robot)
 	http.Handle("/move/", robotHandler)
-	http.HandleFunc("/", handler.IndexHandler)
+	http.Handle("/control/", robotHandler.ListenWS())
 	http.Handle("/camera", stream)
+	http.HandleFunc("/", handler.IndexHandler)
 
 	capture := device.NewWebcamCapture(uint32(*FrameTimeout), *CameraDevice)
 	go func() {

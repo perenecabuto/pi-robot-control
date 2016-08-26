@@ -109,14 +109,12 @@
     </style>
 
     <script>
-    function get(url) {
-        var xhr = new XMLHttpRequest();
-        xhr.open("GET", url, true);
-        xhr.send();
-    }
+    var ws = new WebSocket("ws://" + location.host + "/control/");
 
     function move(action) {
-        get(location.origin + "/move/?direction=" + action);
+        setTimeout(function() {
+            ws.send(action);
+        }, 100);
     }
 
     function bindMove(el, action) {
