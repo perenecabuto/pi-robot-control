@@ -1,15 +1,17 @@
-package main
+package handler
 
 import (
 	"log"
 	"net/http"
+
+	"../device"
 )
 
 type RobotHandler struct {
-	robot *Robot
+	robot *device.Robot
 }
 
-func NewRobotHandler(r *Robot) *RobotHandler {
+func NewRobotHandler(r *device.Robot) *RobotHandler {
 	return &RobotHandler{r}
 }
 

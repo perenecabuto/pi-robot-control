@@ -6,6 +6,9 @@ import (
 	"net/http"
 
 	"github.com/saljam/mjpeg"
+
+	"./device"
+	"./handler"
 )
 
 var (
@@ -16,18 +19,18 @@ var (
 
 func main() {
 	flag.Parse()
-	robot := NewRobot(17, 27, 4, 22)
+	robot := device.NewRobot(17, 27, 4, 22)
 	if err := robot.Initialize(); err != nil {
 		log.Println(err.Error())
 	}
-	robotHandler := NewRobotHandler(robot)
+
 	stream := mjpeg.NewStream()
-	capture := NewWebcamCapture(uint32(*FrameTimeout), *CameraDevice)
-
+	robotHandler := handler.NewRobotHandler(robot)
 	http.Handle("/move/", robotHandler)
-	http.HandleFunc("/", IndexHandler)
-
+	http.HandleFunc("/", handler.IndexHandler)
 	http.Handle("/camera", stream)
+
+	capture := device.NewWebcamCapture(uint32(*FrameTimeout), *CameraDevice)
 	go func() {
 		err := capture.Listen(func(frame []byte) {
 			stream.UpdateJPEG(frame)
