@@ -41,7 +41,7 @@ void compressYUYVtoJPEG(const uint8_t* const input, uint8_t* output, uint32_t wi
     cinfo.in_color_space = JCS_YCbCr; //libJPEG expects YUV 3bytes, 24bit
 
     jpeg_set_defaults(&cinfo);
-    jpeg_set_quality(&cinfo, 92, TRUE);
+    jpeg_set_quality(&cinfo, 80, TRUE);
     jpeg_start_compress(&cinfo, TRUE);
 
     JSAMPROW row_pointer[1];
