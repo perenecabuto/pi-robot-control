@@ -5,16 +5,15 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/saljam/mjpeg"
-
 	"./device"
 	"./handler"
 )
 
 var (
-	FrameTimeout  = flag.Int("frametimeout", 100, "Frame timeout")
 	CameraDevice  = flag.String("d", "/dev/video0", "Video dev path")
 	ServerAddress = flag.String("a", "0.0.0.0:8000", "Server address")
+	FrameTimeout  = flag.Int("frametimeout", 100, "Frame timeout")
+	FPS           = flag.Int("fps", 5, "Frames per second")
 )
 
 func main() {
@@ -24,7 +23,7 @@ func main() {
 		log.Println(err.Error())
 	}
 
-	stream := mjpeg.NewStream()
+	stream := handler.NewMJPEGStream(*FPS)
 	robotHandler := handler.NewRobotHandler(robot)
 	http.Handle("/move/", robotHandler)
 	http.HandleFunc("/", handler.IndexHandler)
