@@ -1,10 +1,13 @@
 package handler
 
 import (
+	"errors"
 	"log"
 	"net/http"
 
 	"../device"
+
+	"golang.org/x/net/websocket"
 )
 
 type RobotHandler struct {
@@ -15,16 +18,48 @@ func NewRobotHandler(r *device.Robot) *RobotHandler {
 	return &RobotHandler{r}
 }
 
+func (h RobotHandler) ListenWS() websocket.Handler {
+	return websocket.Handler(func(ws *websocket.Conn) {
+		log.Println("New WS connection from:" + ws.Request().Host)
+		defer ws.Close()
+		for {
+			if _, err := ws.Write([]byte("")); err != nil {
+				log.Println("Error reading ws")
+				break
+			}
+			var msg string
+			if err := websocket.Message.Receive(ws, &msg); err != nil {
+				log.Println("Error reading ws")
+				break
+			}
+			h.parseAction(msg)
+		}
+		log.Println("Close WS connection from:" + ws.Request().Host)
+	})
+}
+
 func (h RobotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	action := r.URL.Query().Get("direction")
+	err := h.parseAction(action)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+	}
+}
+
+func (h RobotHandler) parseAction(action string) (err error) {
+	log.Println("Got move action:", action)
 	defer func() {
 		if r := recover(); r != nil {
-			log.Println(r)
-			http.Error(w, "Unexpcted error", 500)
+			switch r.(type) {
+			case string:
+				log.Println(err)
+				err = errors.New(r.(string))
+			default:
+				err = errors.New("Unknown error parsing" + action)
+			}
 		}
 	}()
-
-	direction := r.URL.Query().Get("direction")
-	switch direction {
+	switch action {
 	case "right":
 		h.robot.Right()
 	case "left":
@@ -36,9 +71,7 @@ func (h RobotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case "stop":
 		h.robot.Stop()
 	default:
-		http.Error(w, "action "+direction+" is not allowed", 500)
-		return
+		return errors.New("action " + action + " is not allowed")
 	}
-
-	log.Println("Got move action:", direction)
+	return nil
 }
