@@ -38,11 +38,11 @@ upload:
 
 .PHONY=stop
 stop:
-	ssh $(USER)@$(HOST) "eval killall -9 robot-control; echo 1"
+	@ssh $(USER)@$(HOST) "eval killall -9 robot-control; echo killed"
 
 .PHONY=start
 start: stop
-	ssh $(USER)@$(HOST) "cd $(DEPLOY_DIR) && nohup ./robot-control && disown"
+	@ssh $(USER)@$(HOST) "cd $(DEPLOY_DIR) && eval nohup ./robot-control && disown"
 
 .PHONY=deps
 deps:
