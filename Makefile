@@ -51,12 +51,12 @@ deps:
 .PHONY=libjpeg_arm
 libjpeg_arm: download_libjpeg
 	cd $(VENDOR_DIR)/$(LIBJPEG_SRC_NAME) && ./configure --host=arm-linux CC=arm-linux-gnueabi-gcc
-	cd $(VENDOR_DIR)/$(LIBJPEG_SRC_NAME) && make install DESTDIR=`pwd`
+	cd $(VENDOR_DIR)/$(LIBJPEG_SRC_NAME) && make clean install DESTDIR=`pwd`
 
 .PHONY=libjpeg_x86
 libjpeg_x86: download_libjpeg
 	cd $(VENDOR_DIR)/$(LIBJPEG_SRC_NAME) && ./configure
-	cd $(VENDOR_DIR)/$(LIBJPEG_SRC_NAME) && make install DESTDIR=`pwd`
+	cd $(VENDOR_DIR)/$(LIBJPEG_SRC_NAME) && make clean install DESTDIR=`pwd`
 
 .PHONY=install_libjpeg
 install_libjpeg:
