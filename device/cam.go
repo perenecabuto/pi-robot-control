@@ -5,20 +5,21 @@ import (
 	"log"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/blackjack/webcam"
 )
 
-type WebcamCapture struct {
+type WebCam struct {
 	timeout uint32
 	address string
 }
 
-func NewWebcamCapture(timeout uint32, address string) *WebcamCapture {
-	return &WebcamCapture{timeout, address}
+func NewWebCam(timeout uint32, address string) *WebCam {
+	return &WebCam{timeout, address}
 }
 
-func (w WebcamCapture) Listen(onFrame func([]byte)) error {
+func (w *WebCam) Listen(fps int, onFrame func([]byte)) error {
 	cam, err := webcam.Open(w.address) // Open webcam
 	if err != nil {
 		return err
@@ -30,36 +31,45 @@ func (w WebcamCapture) Listen(onFrame func([]byte)) error {
 		return err
 	}
 
-	log.Println("Chosen format:", format)
-
+	log.Println("Starting cam input stream with format:", format)
 	if err := cam.StartStreaming(); err != nil {
 		return err
 	}
-	for {
-		err := cam.WaitForFrame(w.timeout)
-		if err != nil {
-			switch err.(type) {
-			case *webcam.Timeout:
-				continue
-			default:
-				return err
-			}
-		}
 
-		frame, err := cam.ReadFrame()
-		if len(frame) != 0 {
-			var jpegFrame []byte
-			if format.IsJPEG() {
-				jpegFrame = frame
-			} else {
-				jpegFrame, err = CompressImageToJpeg(frame, format.Width, format.Height)
-				if err != nil {
+	ticker := time.NewTicker(time.Second / time.Duration(fps))
+	var jpegFrame []byte
+
+	for {
+		select {
+		case <-ticker.C:
+			go onFrame(jpegFrame)
+		default:
+			err := cam.WaitForFrame(w.timeout)
+			if err != nil {
+				switch err.(type) {
+				case *webcam.Timeout:
+					continue
+				default:
 					return err
 				}
 			}
-			onFrame(jpegFrame)
+
+			frame, err := cam.ReadFrame()
+			if len(frame) != 0 {
+				if format.IsJPEG() {
+					jpegFrame = frame
+				} else {
+					jpegFrame, err = CompressImageToJpeg(frame, format.Width, format.Height)
+					if err != nil {
+						log.Println("Skipping frame - reason:", err)
+						return err
+					}
+				}
+			}
 		}
 	}
+
+	return nil
 }
 
 type CamPixelFormat struct {

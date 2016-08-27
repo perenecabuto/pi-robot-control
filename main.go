@@ -23,22 +23,21 @@ func main() {
 		log.Println(err.Error())
 	}
 
-	stream := handler.NewMJPEGStream(*FPS)
 	robotHandler := handler.NewRobotHandler(robot)
-	http.Handle("/move/", robotHandler)
 	http.Handle("/control/", robotHandler.ListenWS())
-	http.Handle("/camera", stream)
 	http.HandleFunc("/", handler.IndexHandler)
 
-	capture := device.NewWebcamCapture(uint32(*FrameTimeout), *CameraDevice)
-	go func() {
-		err := capture.Listen(func(frame []byte) {
-			stream.UpdateJPEG(frame)
-		})
-		if err != nil {
-			log.Println("Error starting camera:", err)
+	cam := device.NewWebCam(uint32(*FrameTimeout), *CameraDevice)
+	stream := handler.NewMJPEGStream(*FPS)
+	endpointOpened := false
+	go cam.Listen(*FPS, func(frame []byte) {
+		if !endpointOpened {
+			log.Println("Open camera endpoint")
+			http.Handle("/camera", stream)
+			endpointOpened = true
 		}
-	}()
+		stream.UpdateJPEG(frame)
+	})
 
 	log.Println("Starting server on:", *ServerAddress)
 	log.Panic(http.ListenAndServe(*ServerAddress, nil))
