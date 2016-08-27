@@ -3,7 +3,6 @@ package handler
 import (
 	"errors"
 	"log"
-	"net/http"
 
 	"../device"
 
@@ -36,14 +35,6 @@ func (h RobotHandler) ListenWS() websocket.Handler {
 		}
 		log.Println("Close WS connection from:" + ws.Request().Host)
 	})
-}
-
-func (h RobotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	action := r.URL.Query().Get("direction")
-	err := h.parseAction(action)
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-	}
 }
 
 func (h RobotHandler) parseAction(action string) (err error) {
