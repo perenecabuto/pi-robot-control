@@ -12,7 +12,7 @@ import (
 var (
 	CameraDevice  = flag.String("d", "/dev/video0", "Video dev path")
 	ServerAddress = flag.String("a", "0.0.0.0:8000", "Server address")
-	FrameTimeout  = flag.Int("frametimeout", 100, "Frame timeout")
+	FrameTimeout  = flag.Int("frametimeout", 1000, "Frame timeout")
 	FPS           = flag.Int("fps", 5, "Frames per second")
 )
 
