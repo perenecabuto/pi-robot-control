@@ -30,7 +30,7 @@ func main() {
 	cam := device.NewWebCam(uint32(*FrameTimeout), *CameraDevice)
 	stream := handler.NewMJPEGStream(*FPS)
 	endpointOpened := false
-	go cam.Listen(*FPS, func(frame []byte) {
+	go cam.Listen(*FPS, func(frame *[]byte) {
 		if !endpointOpened {
 			log.Println("Open camera endpoint")
 			http.Handle("/camera", stream)
