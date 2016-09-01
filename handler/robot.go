@@ -38,7 +38,6 @@ func (h RobotHandler) ListenWS() websocket.Handler {
 }
 
 func (h RobotHandler) parseAction(action string) (err error) {
-	log.Println("Got move action:", action)
 	defer func() {
 		if r := recover(); r != nil {
 			switch r.(type) {
@@ -50,6 +49,7 @@ func (h RobotHandler) parseAction(action string) (err error) {
 			}
 		}
 	}()
+
 	switch action {
 	case "right":
 		h.robot.Right()
