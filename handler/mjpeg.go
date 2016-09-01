@@ -27,6 +27,10 @@ func NewMJPEGStream(fps int) *MJPEGStream {
 func (s *MJPEGStream) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	log.Println("Stream:", r.RemoteAddr, "connected")
 	w.Header().Add("Content-Type", "multipart/x-mixed-replace;boundary="+s.boundary)
+	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+	w.Header().Set("Pragma", "no-cache")
+	w.Header().Set("Expires", "0")
+	w.Header().Set("Last-Modified", time.Now().UTC().Format(http.TimeFormat))
 
 	c := time.Tick(time.Second / time.Duration(s.fps))
 	for range c {
