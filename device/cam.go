@@ -10,6 +10,11 @@ import (
 	"github.com/blackjack/webcam"
 )
 
+const (
+	MAX_WIDTH  = 320
+	MAX_HEIGHT = 240
+)
+
 type WebCam struct {
 	timeout uint32
 	address string
@@ -118,6 +123,12 @@ func setupCamImageFormat(cam *webcam.Webcam) (*CamPixelFormat, error) {
 	size := supportedSizes[0]
 
 	found.Width, found.Height = size.MaxWidth, size.MaxHeight
+	if found.Width > MAX_WIDTH {
+		found.Width = MAX_WIDTH
+	}
+	if found.Height > MAX_HEIGHT {
+		found.Height = MAX_HEIGHT
+	}
 	_, _, _, err := cam.SetImageFormat(format, found.Width, found.Height)
 
 	return found, err
