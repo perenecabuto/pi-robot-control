@@ -12,6 +12,7 @@ LIBJPEG_SRC_TGZ := jpegsrc.v9.tar.gz
 #LIBJPEG_SRC_TGZ := libjpeg-turbo-1.5.0.tar.gz
 LIBJPEG_SRC_URL := http://www.ijg.org/files/$(LIBJPEG_SRC_TGZ)
 #LIBJPEG_SRC_URL := http://ufpr.dl.sourceforge.net/project/libjpeg-turbo/1.5.0/$(LIBJPEG_SRC_TGZ)
+ARM_COMPILER := arm-linux-gnueabi-gcc
 
 CFLAGS := "-I$(LIBJPEG_DIR)/include  -ljpeg -O3"
 LDFLAGS := "-L$(LIBJPEG_DIR)/lib -Wl,-rpath=\$$ORIGIN/vendor/libjpeg/lib/ -O3"
@@ -22,12 +23,12 @@ build: libjpeg_x86 install_libjpeg
 	CGO_ENABLED=1 GOOS=linux CGO_CFLAGS=$(CFLAGS) CGO_LDFLAGS=$(LDFLAGS) go build -v
 
 .PHONY=cross_arm
-cross_arm: libjpeg_arm install_libjpeg
-	CGO_ENABLED=1 CC=arm-linux-gnueabi-gcc GOOS=linux GOARCH=arm CGO_CFLAGS=$(CFLAGS) CGO_LDFLAGS=$(LDFLAGS) go build -v
+cross_arm:
+	CGO_ENABLED=1 CC=$(ARM_COMPILER) CGO_CFLAGS=$(CFLAGS) CGO_LDFLAGS=$(LDFLAGS) GOOS=linux GOARCH=arm go build
 
 .PHONY=deploy upload
 deploy: cross_arm upload
-	@echo Start deploy to $(HOST)
+	@echo Deployed to $(HOST)
 
 upload:
 	ssh $(USER)@$(HOST) "mkdir -p $(DEPLOY_DIR)"
@@ -50,7 +51,7 @@ deps:
 
 .PHONY=libjpeg_arm
 libjpeg_arm: download_libjpeg
-	cd $(VENDOR_DIR)/$(LIBJPEG_SRC_NAME) && ./configure --host=arm-linux CC=arm-linux-gnueabi-gcc
+	cd $(VENDOR_DIR)/$(LIBJPEG_SRC_NAME) && ./configure --host=arm-linux CC=$(ARM_COMPILER)
 	cd $(VENDOR_DIR)/$(LIBJPEG_SRC_NAME) && make clean install DESTDIR=`pwd`
 
 .PHONY=libjpeg_x86
