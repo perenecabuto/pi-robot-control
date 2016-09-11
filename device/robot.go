@@ -1,49 +1,55 @@
 package device
 
 import (
-	"time"
+	"log"
+	"strconv"
 
-	"github.com/stianeikeland/go-rpio"
+	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/platforms/gpio"
+	"github.com/hybridgroup/gobot/platforms/raspi"
 )
 
 const ACTION_TIMEOUT_SEC = 5
 
 type Robot struct {
-	pin1F     rpio.Pin
-	pin2F     rpio.Pin
-	pin1B     rpio.Pin
-	pin2B     rpio.Pin
-	stopTimer *time.Timer
+	pin1F *gpio.DirectPinDriver
+	pin2F *gpio.DirectPinDriver
+	pin1B *gpio.DirectPinDriver
+	pin2B *gpio.DirectPinDriver
 }
 
-func NewRobot(gpio1F, gpio2F, gpio1B, gpio2B uint8) *Robot {
-	pin1F := rpio.Pin(gpio1F)
-	pin2F := rpio.Pin(gpio2F)
-	pin1B := rpio.Pin(gpio1B)
-	pin2B := rpio.Pin(gpio2B)
-	timer := time.NewTimer(ACTION_TIMEOUT_SEC)
+var (
+	gbot = gobot.NewGobot()
+	rasp = raspi.NewRaspiAdaptor("raspi")
+)
 
-	return &Robot{pin1F, pin2F, pin1B, pin2B, timer}
+func NewRobot(gpio1F, gpio2F, gpio1B, gpio2B int) *Robot {
+	rasp.Connect()
+	gpios := []int{gpio1F, gpio2F, gpio1B, gpio2B}
+	pins := make([]*gpio.DirectPinDriver, 4)
+	for i, g := range gpios {
+		name := strconv.Itoa(g)
+		pins[i] = gpio.NewDirectPinDriver(rasp, "gpio"+name, name)
+	}
+	return &Robot{pins[0], pins[1], pins[2], pins[3]}
+}
+
+func (r Robot) Pins() []*gpio.DirectPinDriver {
+	return []*gpio.DirectPinDriver{r.pin1F, r.pin2F, r.pin1B, r.pin2B}
 }
 
 func (r Robot) Initialize() error {
-	err := rpio.Open()
-	if err != nil {
-		return err
+	robot := gobot.NewRobot("robot", []gobot.Connection{rasp})
+	gbot.AddRobot(robot)
+	for _, pin := range r.Pins() {
+		if err := pin.Start(); err != nil {
+			log.Panicf("%#v\n", err)
+		}
+		robot.AddDevice(pin)
 	}
 
-	r.pin1F.Output()
-	r.pin2F.Output()
-	r.pin1B.Output()
-	r.pin2B.Output()
+	go gbot.Start()
 	r.Stop()
-
-	go func() {
-		for range r.stopTimer.C {
-			r.stopTimer.Stop()
-			r.Stop()
-		}
-	}()
 
 	return nil
 }
@@ -69,24 +75,21 @@ func (r Robot) Stop() {
 }
 
 func (r Robot) move(val1F, val2F, val1B, val2B bool) {
-	go r.autoStop()
 	toggle(r.pin1F, val1F)
 	toggle(r.pin2F, val2F)
 	toggle(r.pin1B, val1B)
 	toggle(r.pin2B, val2B)
 }
 
-func (r Robot) autoStop() {
-	if !r.stopTimer.Stop() {
-		<-r.stopTimer.C
-	}
-	r.stopTimer.Reset(ACTION_TIMEOUT_SEC)
-}
-
-func toggle(pin rpio.Pin, on bool) {
+func toggle(pin *gpio.DirectPinDriver, on bool) {
+	pin.Start()
 	if on {
-		pin.High()
+		if err := pin.On(); err != nil {
+			log.Println(err.Error())
+		}
 	} else {
-		pin.Low()
+		if err := pin.Off(); err != nil {
+			log.Println(err.Error())
+		}
 	}
 }
