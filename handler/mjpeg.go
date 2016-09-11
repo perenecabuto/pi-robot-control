@@ -44,6 +44,9 @@ func (s *MJPEGStream) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *MJPEGStream) UpdateJPEG(jpeg *[]byte) {
+	if jpeg == nil {
+		return
+	}
 	jpegLen := len(*jpeg)
 	header := s.buildHeader(jpegLen)
 	if s.frame == nil || len(s.frame) < jpegLen+len(header) {
