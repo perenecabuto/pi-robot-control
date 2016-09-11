@@ -4,6 +4,9 @@ import (
 	"flag"
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"./device"
 	"./handler"
@@ -19,8 +22,16 @@ var (
 func main() {
 	flag.Parse()
 	robot := device.NewRobot(17, 27, 4, 22)
+	c := make(chan os.Signal, 2)
+	signal.Notify(c, os.Interrupt, syscall.SIGKILL|syscall.SIGTERM)
+	go func() {
+		<-c
+		robot.CleanUP()
+		os.Exit(1)
+	}()
+
 	if err := robot.Initialize(); err != nil {
-		log.Println(err.Error())
+		log.Println("Error - Robot init", err.Error())
 	}
 
 	robotHandler := handler.NewRobotHandler(robot)
