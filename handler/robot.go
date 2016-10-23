@@ -69,6 +69,19 @@ func (h RobotHandler) parseAction(msg string) (err error) {
 		h.robot.Move.Backward()
 	case "move-stop":
 		h.robot.Move.Stop()
+	case "look-to":
+		if len(params) < 2 {
+			return errors.New("look-to must receive x and y")
+		}
+		angles := make([]uint8, 2)
+		for i, p := range params[:2] {
+			a, err := strconv.Atoi(p)
+			if err != nil {
+				return err
+			}
+			angles[i] = uint8(a)
+		}
+		return h.robot.Look.To(angles[0], angles[1])
 	default:
 		return errors.New("action " + action + " is not allowed")
 	}
