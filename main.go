@@ -4,6 +4,8 @@ import (
 	"flag"
 	"log"
 	"net/http"
+	"strconv"
+	"strings"
 
 	"./device"
 	"./handler"
@@ -14,11 +16,23 @@ var (
 	ServerAddress = flag.String("a", "0.0.0.0:8000", "Server address")
 	FrameTimeout  = flag.Int("frametimeout", 1000, "Frame timeout")
 	FPS           = flag.Int("fps", 5, "Frames per second")
+	WheelPins     = flag.String("pins", "25,27,17,22", "Wheel gpios as int separated with by comma."+
+		"The order is : <left-forward>,<right-forward>,<left back>,<right back>")
 )
 
 func main() {
 	flag.Parse()
 	robot := device.NewRobot(17, 27, 4, 22)
+
+	pins := make([]uint8, 4, 4)
+	for i, pin := range strings.SplitN(*WheelPins, ",", 4) {
+		if ipin, err := strconv.Atoi(pin); err == nil {
+			pins[i] = uint8(ipin)
+		} else {
+			panic("ERROR - Pins must be a list of four ints separated by comma: " + err.Error())
+		}
+	}
+
 	if err := robot.Initialize(); err != nil {
 		log.Println(err.Error())
 	}
