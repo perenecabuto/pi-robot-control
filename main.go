@@ -22,7 +22,6 @@ var (
 
 func main() {
 	flag.Parse()
-	robot := device.NewRobot(17, 27, 4, 22)
 
 	pins := make([]uint8, 4, 4)
 	for i, pin := range strings.SplitN(*WheelPins, ",", 4) {
@@ -33,6 +32,10 @@ func main() {
 		}
 	}
 
+	log.Println("WheelPins", pins)
+	motorC := device.NewMotorController(pins[0], pins[1], pins[2], pins[3])
+	camPositionC := device.NewCamPositionController(24, 23)
+	robot := device.NewRobot(motorC, camPositionC)
 	if err := robot.Initialize(); err != nil {
 		log.Println(err.Error())
 	}
