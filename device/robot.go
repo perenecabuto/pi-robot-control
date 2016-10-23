@@ -2,7 +2,6 @@ package device
 
 import (
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/stianeikeland/go-rpio"
@@ -35,7 +34,6 @@ func NewCamPositionController(xAxisGPIO, yAxisGPIO uint8) *CamPositionController
 }
 
 func (c CamPositionController) To(xAngle, yAngle uint8) error {
-	log.Println("Look to", xAngle, yAngle)
 	if c.fd == nil {
 		var err error
 		if c.fd, err = os.OpenFile("/dev/pi-blaster", os.O_WRONLY, os.ModeExclusive); err != nil {
@@ -50,11 +48,8 @@ func (c CamPositionController) To(xAngle, yAngle uint8) error {
 }
 
 func (c CamPositionController) moveServoAngle(gpio, angle uint8) error {
-	log.Println("Move servo on", gpio, "to", angle)
 	pulse := c.MinPulse + (c.MaxPulse * (float32(angle) / 180.0))
-	log.Printf("servo - angle:%d pulse:%f", angle, pulse)
 	cmd := fmt.Sprintf("%d=%f\n", gpio, pulse)
-	log.Printf("servoblaster: sending command %q", cmd)
 	_, err := c.fd.WriteString(cmd)
 	return err
 }
