@@ -52,10 +52,15 @@ func (h RobotHandler) parseAction(action string) (err error) {
 
 	switch action {
 	case "move-right":
+		h.robot.Move.Right()
 	case "move-left":
+		h.robot.Move.Left()
 	case "move-forward":
+		h.robot.Move.Forward()
 	case "move-backward":
+		h.robot.Move.Backward()
 	case "move-stop":
+		h.robot.Move.Stop()
 	default:
 		return errors.New("action " + action + " is not allowed")
 	}
