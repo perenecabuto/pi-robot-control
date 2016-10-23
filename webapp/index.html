@@ -80,6 +80,10 @@
         ws.send("move-"+action);
     }
 
+    function lookTo(xAngle, yAngle) {
+        ws.send("look-to:"+xAngle+":"+yAngle);
+    }
+
     function bindMove(el, action) {
         var startfn = function(e) {
             move(action);
@@ -125,7 +129,13 @@
             this.src = baseURL + ":8080/?action=stream";
             document.getElementById("camera").removeEventListener("error", fallback);
         };
-        document.getElementById("camera").addEventListener("error", fallback);
+        var cam = document.getElementById("camera");
+        cam.addEventListener("error", fallback);
+        cam.addEventListener("mousedown", function(e) {
+            var xAngle = (e.pageX * 180) / cam.width;
+            var yAngle = (e.pageY * 180) / cam.height;
+            lookTo(parseInt(xAngle), parseInt(yAngle));
+        });
 
         var buttons = document.getElementsByTagName("button");
         for (var i = 0; i < buttons.length; i++) {
@@ -135,6 +145,7 @@
             }
         }
     });
+
     </script>
 </head>
 
