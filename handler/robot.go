@@ -3,6 +3,8 @@ package handler
 import (
 	"errors"
 	"log"
+	"strconv"
+	"strings"
 
 	"../device"
 
@@ -31,13 +33,15 @@ func (h RobotHandler) ListenWS() websocket.Handler {
 				log.Println("Error reading ws")
 				break
 			}
-			h.parseAction(msg)
+			if err := h.parseAction(msg); err != nil {
+				log.Println("Error:", err)
+			}
 		}
 		log.Println("Close WS connection from:" + ws.Request().Host)
 	})
 }
 
-func (h RobotHandler) parseAction(action string) (err error) {
+func (h RobotHandler) parseAction(msg string) (err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			switch r.(type) {
@@ -45,10 +49,14 @@ func (h RobotHandler) parseAction(action string) (err error) {
 				log.Println(err)
 				err = errors.New(r.(string))
 			default:
-				err = errors.New("Unknown error parsing" + action)
+				err = errors.New("Unknown error parsing" + msg)
 			}
 		}
 	}()
+
+	params := strings.Split(msg, ":")
+	action := params[0]
+	params = params[1:]
 
 	switch action {
 	case "move-right":
