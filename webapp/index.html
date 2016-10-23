@@ -77,7 +77,7 @@
     var ws = new WebSocket("ws://" + location.host + "/control/");
 
     function move(action) {
-        ws.send(action);
+        ws.send("move-"+action);
     }
 
     function bindMove(el, action) {
