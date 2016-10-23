@@ -1,0 +1,16 @@
+#!/bin/bash
+
+### BEGIN INIT INFO
+# Provides:          robot-control
+# Required-Start:    $remote_fs $syslog
+# Required-Stop:     $remote_fs $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0
+# Short-Description: Simple script to start a program at boot
+### END INIT INFO
+
+#su - pi -c "cd mjpg-streamer && nohup ./start.sh &"
+pi-blaster -g 23,24
+su - pi -c "cd robot-control && nohup ./robot-control &"
+
+exit 0
