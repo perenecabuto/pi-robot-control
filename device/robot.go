@@ -10,6 +10,53 @@ import (
 
 type Robot struct {
 	Move *MotorController
+	Look *CamPositionController
+}
+
+func NewRobot(motor *MotorController, camPosition *CamPositionController) *Robot {
+	return &Robot{motor, camPosition}
+}
+
+func (r Robot) Initialize() error {
+	return r.Move.Initialize()
+}
+
+type CamPositionController struct {
+	xAxisGPIO uint8
+	yAxisGPIO uint8
+	MinPulse  float32
+	MaxPulse  float32
+
+	fd *os.File
+}
+
+func NewCamPositionController(xAxisGPIO, yAxisGPIO uint8) *CamPositionController {
+	return &CamPositionController{xAxisGPIO, yAxisGPIO, 0.05, 0.2, nil}
+}
+
+func (c CamPositionController) To(xAngle, yAngle uint8) error {
+	log.Println("Look to", xAngle, yAngle)
+	if c.fd == nil {
+		var err error
+		if c.fd, err = os.OpenFile("/dev/pi-blaster", os.O_WRONLY, os.ModeExclusive); err != nil {
+			return err
+		}
+	}
+
+	if err := c.moveServoAngle(c.xAxisGPIO, xAngle); err != nil {
+		return err
+	}
+	return c.moveServoAngle(c.yAxisGPIO, yAngle)
+}
+
+func (c CamPositionController) moveServoAngle(gpio, angle uint8) error {
+	log.Println("Move servo on", gpio, "to", angle)
+	pulse := c.MinPulse + (c.MaxPulse * (float32(angle) / 180.0))
+	log.Printf("servo - angle:%d pulse:%f", angle, pulse)
+	cmd := fmt.Sprintf("%d=%f\n", gpio, pulse)
+	log.Printf("servoblaster: sending command %q", cmd)
+	_, err := c.fd.WriteString(cmd)
+	return err
 }
 
 type MotorController struct {
