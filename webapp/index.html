@@ -135,7 +135,7 @@
         cam.addEventListener("mousedown", function(e) {
             var xAngle = (e.pageX * 180) / cam.width;
             var yAngle = (e.pageY * 180) / cam.height;
-            lookTo(parseInt(xAngle), parseInt(yAngle));
+            lookTo(parseInt(180 - xAngle), parseInt(yAngle));
         });
 
         var buttons = document.getElementsByTagName("button");
