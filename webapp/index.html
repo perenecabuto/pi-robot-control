@@ -48,6 +48,21 @@
         right: 0;
         bottom: 0;
     }
+    .widget-container .camera-position-control {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+
+        box-shadow: none;
+        text-align: right;
+        font-weight: bold;
+        font-family: monospace;
+        text-shadow: 1px 1px 4px grey;
+    }
 
     @media (orientation:landscape) {
         .widget-container {
@@ -153,9 +168,10 @@
 <body>
     <div class="widget-container camera-container">
         <img id="camera" src="/camera" />
+        <div id="camera-control" class="camera-position-control"></div>
     </div>
 
-    <div class="widget-container controls-container">
+    <div id="controls-container" class="widget-container controls-container">
         <button action="forward">&#x2191;</button>
         <br />
         <button action="left">&#x2190;</button>
