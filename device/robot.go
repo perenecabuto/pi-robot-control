@@ -26,10 +26,11 @@ type CamPositionController struct {
 	MinPulse  float32
 	MaxPulse  float32
 
-	xMinAngle uint8
-	xMaxAngle uint8
-	yMinAngle uint8
-	yMaxAngle uint8
+	xMinAngle           uint8
+	xMaxAngle           uint8
+	yMinAngle           uint8
+	yMaxAngle           uint8
+	yCenterCompensation uint8
 
 	fd *os.File
 }
@@ -37,7 +38,8 @@ type CamPositionController struct {
 func NewCamPositionController(xAxisGPIO, yAxisGPIO uint8) *CamPositionController {
 	return &CamPositionController{xAxisGPIO, yAxisGPIO, 0.05, 0.25,
 		50, 140,
-		10, 110,
+		30, 110,
+		30,
 		nil}
 }
 
@@ -52,6 +54,9 @@ func (c CamPositionController) To(xAngle, yAngle uint8) error {
 	xAngle = limit(xAngle, c.xMinAngle, c.xMaxAngle)
 	if err := c.moveServoAngle(c.xAxisGPIO, xAngle); err != nil {
 		return err
+	}
+	if yAngle >= c.yCenterCompensation {
+		yAngle -= c.yCenterCompensation
 	}
 	yAngle = limit(yAngle, c.yMinAngle, c.yMaxAngle)
 	return c.moveServoAngle(c.yAxisGPIO, yAngle)

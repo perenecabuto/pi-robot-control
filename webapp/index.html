@@ -127,12 +127,10 @@
         };
         var looktofn = function(e) {
             if (!camStartMove) return false;
-            var xCompensation = 0;
-            var yCompensation = 60;
             var x = e.changedTouches !== undefined ? e.changedTouches[0].pageX : e.pageX;
             var y = e.changedTouches !== undefined ? e.changedTouches[0].pageY : e.pageY;
-            var xAngle = parseInt((x * (180 - xCompensation)) / camControlsEl.offsetWidth);
-            var yAngle = parseInt((y * (180 - yCompensation)) / camControlsEl.offsetHeight);
+            var xAngle = parseInt((x * 180) / camControlsEl.offsetWidth);
+            var yAngle = parseInt((y * 180) / camControlsEl.offsetHeight);
             xAngle = 180 - xAngle; // Invert x direction
 
             camControlsEl.innerText = " angle:"+xAngle+","+yAngle;
