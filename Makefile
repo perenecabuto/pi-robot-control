@@ -35,7 +35,7 @@ upload:
 	ssh $(USER)@$(HOST) "mkdir -p $(DEPLOY_DIR)/vendor"
 	scp -r webapp $(USER)@$(HOST):$(DEPLOY_DIR)
 	scp -r robot-control $(USER)@$(HOST):$(DEPLOY_DIR)
-	scp -r $(LIBJPEG_DIR) $(USER)@$(HOST):$(DEPLOY_DIR)/vendor
+	#scp -r $(LIBJPEG_DIR) $(USER)@$(HOST):$(DEPLOY_DIR)/vendor
 
 .PHONY=stop
 stop:
