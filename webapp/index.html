@@ -118,6 +118,39 @@
         el.addEventListener("touchcancel", stopfn, false);
     }
 
+    function bindCamControls(camControlsEl) {
+        var camStartMove = false;
+        var startfn = function(e) {
+            e.preventDefault();
+            camStartMove = true;
+            return false;
+        };
+        var looktofn = function(e) {
+            if (!camStartMove) return false;
+            var xCompensation = 0;
+            var yCompensation = 60;
+            var x = e.changedTouches !== undefined ? e.changedTouches[0].pageX : e.pageX;
+            var y = e.changedTouches !== undefined ? e.changedTouches[0].pageY : e.pageY;
+            var xAngle = parseInt((x * (180 - xCompensation)) / camControlsEl.offsetWidth);
+            var yAngle = parseInt((y * (180 - yCompensation)) / camControlsEl.offsetHeight);
+            xAngle = 180 - xAngle; // Invert x direction
+
+            camControlsEl.innerText = " angle:"+xAngle+","+yAngle;
+            lookTo(xAngle, yAngle);
+        };
+        var endfn = function(e) {
+            camStartMove = false;
+        };
+        camControlsEl.addEventListener("mousedown", startfn);
+        camControlsEl.addEventListener("touchstart", startfn);
+        camControlsEl.addEventListener("mousemove", looktofn);
+        camControlsEl.addEventListener("touchmove", looktofn);
+        camControlsEl.addEventListener("mouseup", endfn);
+        camControlsEl.addEventListener("touchend", endfn);
+        camControlsEl.addEventListener("touchcancel", endfn);
+        camControlsEl.addEventListener("touchleave", endfn);
+    }
+
     window.document.addEventListener("keydown", function(event) {
         switch (event.key) {
         case "ArrowLeft":
@@ -145,13 +178,9 @@
             this.src = baseURL + ":8080/?action=stream";
             document.getElementById("camera").removeEventListener("error", fallback);
         };
-        var cam = document.getElementById("camera");
-        cam.addEventListener("error", fallback);
-        cam.addEventListener("mousedown", function(e) {
-            var xAngle = (e.pageX * 180) / cam.width;
-            var yAngle = (e.pageY * 180) / cam.height;
-            lookTo(parseInt(180 - xAngle), parseInt(yAngle));
-        });
+
+        var camControls = document.getElementById("camera-control");
+        bindCamControls(camControls);
 
         var buttons = document.getElementsByTagName("button");
         for (var i = 0; i < buttons.length; i++) {
