@@ -31,8 +31,8 @@ func main() {
 			panic("ERROR - Pins must be a list of four ints separated by comma: " + err.Error())
 		}
 	}
-
 	log.Println("WheelPins", pins)
+
 	motorC := device.NewMotorController(pins[0], pins[1], pins[2], pins[3])
 	camPositionC := device.NewCamPositionController(24, 23)
 	robot := device.NewRobot(motorC, camPositionC)
@@ -42,6 +42,7 @@ func main() {
 
 	robotHandler := handler.NewRobotHandler(robot)
 	http.Handle("/control/", robotHandler.ListenWS())
+	http.HandleFunc("/compass/", handler.CompassHandler)
 	http.HandleFunc("/", handler.IndexHandler)
 
 	cam := device.NewWebCam(uint32(*FrameTimeout), *CameraDevice)
