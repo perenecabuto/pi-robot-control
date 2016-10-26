@@ -17,6 +17,7 @@ ARM_COMPILER := arm-linux-gnueabihf-gcc
 CFLAGS := "-I$(LIBJPEG_DIR)/include  -ljpeg -O3"
 LDFLAGS := "-L$(LIBJPEG_DIR)/lib -Wl,-rpath=\$$ORIGIN/vendor/libjpeg/lib/ -O3"
 
+remote = @ssh $(USER)@$(HOST)
 
 .PHONY=build
 build: libjpeg_x86 install_libjpeg
@@ -31,19 +32,24 @@ deploy: cross_arm upload
 	@echo Deployed to $(HOST)
 
 upload:
-	ssh $(USER)@$(HOST) "mkdir -p $(DEPLOY_DIR)"
-	ssh $(USER)@$(HOST) "mkdir -p $(DEPLOY_DIR)/vendor"
+	$(remote) "mkdir -p $(DEPLOY_DIR)"
+	$(remote) "mkdir -p $(DEPLOY_DIR)/vendor"
 	scp -r webapp $(USER)@$(HOST):$(DEPLOY_DIR)
 	scp -r robot-control $(USER)@$(HOST):$(DEPLOY_DIR)
 	#scp -r $(LIBJPEG_DIR) $(USER)@$(HOST):$(DEPLOY_DIR)/vendor
 
 .PHONY=stop
 stop:
-	@ssh $(USER)@$(HOST) "eval killall -9 robot-control; echo killed"
+	$(remote) "eval killall -9 robot-control; echo killed"
 
 .PHONY=start
 start: stop
-	@ssh $(USER)@$(HOST) "cd $(DEPLOY_DIR) && eval nohup ./robot-control && disown"
+	$(remote) "cd $(DEPLOY_DIR) && eval nohup ./robot-control && disown"
+
+.PHONY=remote-deps
+remote-deps:
+	$(remote) sudo aptitude install -y i2c-tools
+
 
 .PHONY=deps
 deps:
