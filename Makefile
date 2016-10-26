@@ -23,6 +23,10 @@ remote = @ssh $(USER)@$(HOST)
 build: libjpeg_x86 install_libjpeg
 	CGO_ENABLED=1 GOOS=linux CGO_CFLAGS=$(CFLAGS) CGO_LDFLAGS=$(LDFLAGS) go build -v
 
+.PHONY=test
+test:
+	CompileDaemon -command "go test -v"
+
 .PHONY=cross_arm
 cross_arm:
 	CGO_ENABLED=1 CC=$(ARM_COMPILER) CGO_CFLAGS=$(CFLAGS) CGO_LDFLAGS=$(LDFLAGS) GOOS=linux GOARCH=arm go build
