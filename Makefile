@@ -25,7 +25,7 @@ build: libjpeg_x86 install_libjpeg
 
 .PHONY=test
 test:
-	CompileDaemon -command "go test -v"
+	CompileDaemon -color -command "go test ./..."
 
 .PHONY=cross_arm
 cross_arm:
