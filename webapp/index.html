@@ -121,8 +121,10 @@
 
     function bindCamControls(camControlsEl) {
         var camStartMove = false;
+        var timeoutHandler;
         var startfn = function(e) {
             e.preventDefault();
+            clearTimeout(timeoutHandler);
             camStartMove = true;
             return false;
         };
@@ -134,11 +136,15 @@
             var yAngle = parseInt((y * 180) / camControlsEl.offsetHeight);
             xAngle = 180 - xAngle; // Invert x direction
 
-            camControlsEl.innerText = " angle:"+xAngle+","+yAngle;
             lookTo(xAngle, yAngle);
         };
         var endfn = function(e) {
             camStartMove = false;
+            timeoutHandler = setTimeout(centerfn, 2000);
+        };
+        var centerfn = function() {
+            lookTo(87, 90);
+            return false;
         };
         camControlsEl.addEventListener("mousedown", startfn);
         camControlsEl.addEventListener("touchstart", startfn);
@@ -148,6 +154,7 @@
         camControlsEl.addEventListener("touchend", endfn);
         camControlsEl.addEventListener("touchcancel", endfn);
         camControlsEl.addEventListener("touchleave", endfn);
+        camControlsEl.addEventListener("dblclick", centerfn);
     }
 
     window.document.addEventListener("keydown", function(event) {
