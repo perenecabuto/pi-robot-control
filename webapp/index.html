@@ -97,6 +97,7 @@
     }
 
     function lookTo(xAngle, yAngle) {
+        document.getElementById("camera-control").innerText = " angle:"+xAngle+","+yAngle;
         ws.send("look-to:"+xAngle+":"+yAngle);
     }
 
