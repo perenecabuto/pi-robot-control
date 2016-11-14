@@ -44,12 +44,6 @@ func NewCamPositionController(xAxisGPIO, yAxisGPIO uint8) *CamPositionController
 }
 
 func (c CamPositionController) To(xAngle, yAngle uint8) error {
-	if c.fd == nil {
-		var err error
-		if c.fd, err = os.OpenFile("/dev/pi-blaster", os.O_WRONLY, os.ModeExclusive); err != nil {
-			return err
-		}
-	}
 
 	xAngle = limit(xAngle, c.xMinAngle, c.xMaxAngle)
 	if err := c.moveServoAngle(c.xAxisGPIO, xAngle); err != nil {
@@ -75,7 +69,14 @@ func limit(value, min, max uint8) uint8 {
 func (c CamPositionController) moveServoAngle(gpio, angle uint8) error {
 	pulse := c.MinPulse + (c.MaxPulse * (float32(angle) / 180.0))
 	cmd := fmt.Sprintf("%d=%f\n", gpio, pulse)
-	_, err := c.fd.WriteString(cmd)
+	var err error
+	if c.fd == nil {
+		if c.fd, err = os.OpenFile("/dev/pi-blaster", os.O_WRONLY, os.ModeExclusive); err != nil {
+			return err
+		}
+	}
+	_, err = c.fd.WriteString(cmd)
+	c.fd.Sync()
 	return err
 }
 
