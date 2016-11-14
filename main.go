@@ -42,6 +42,7 @@ func main() {
 
 	robotHandler := handler.NewRobotHandler(robot)
 	http.Handle("/control/", robotHandler.ListenWS())
+	http.Handle("/robot/look-to/", robotHandler.LookToHandler())
 	http.HandleFunc("/compass/", handler.CompassHandler)
 	http.HandleFunc("/", handler.IndexHandler)
 

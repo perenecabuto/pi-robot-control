@@ -3,6 +3,7 @@ package handler
 import (
 	"errors"
 	"log"
+	"net/http"
 	"strconv"
 	"strings"
 
@@ -17,6 +18,20 @@ type RobotHandler struct {
 
 func NewRobotHandler(r *device.Robot) *RobotHandler {
 	return &RobotHandler{r}
+}
+
+func (h RobotHandler) LookToHandler() http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		qs := r.URL.Query()
+		x, _ := strconv.Atoi(qs.Get("x"))
+		y, _ := strconv.Atoi(qs.Get("y"))
+		if err := h.robot.Look.To(uint8(x), uint8(y)); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		log.Println("Look.To", x, y)
+		w.Write([]byte("OK"))
+	})
 }
 
 func (h RobotHandler) ListenWS() websocket.Handler {
