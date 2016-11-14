@@ -54,7 +54,6 @@ start: stop
 remote-deps:
 	$(remote) sudo aptitude install -y i2c-tools
 
-
 .PHONY=deps
 deps:
 	sudo aptitude install -y gccgo-arm-linux-gnueabi
