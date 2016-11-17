@@ -58,6 +58,7 @@ func main() {
 		stream.UpdateJPEG(frame)
 	})
 
+	robot.Look.To(90, 90)
 	log.Println("Starting server on:", *ServerAddress)
 	log.Panic(http.ListenAndServe(*ServerAddress, nil))
 }
