@@ -96,6 +96,25 @@
         ws.send("move-"+action);
     }
 
+    function updateCompass() {
+        fetch("/compass").then(function(response) {
+            response.json().then(function(compass) {
+                document.getElementById("compass").innerText =
+                " x:" + compass.X +
+                " y:" + compass.Y +
+                " z:" + compass.Z +
+                " direction:" + compass.direction;
+            });
+        });
+    }
+
+    function autoUpdateCompass() {
+        updateCompass();
+        setTimeout(autoUpdateCompass, 1000);
+    }
+
+    autoUpdateCompass();
+
     function lookTo(xAngle, yAngle) {
         document.getElementById("camera-control").innerText = " angle:"+xAngle+","+yAngle;
         ws.send("look-to:"+xAngle+":"+yAngle);
@@ -204,7 +223,9 @@
     <div class="widget-container camera-container">
         <img id="camera" src="/camera" />
         <div id="camera-control" class="camera-position-control"></div>
+        <pre id="compass">loading compass...</pre>
     </div>
+
 
     <div id="controls-container" class="widget-container controls-container">
         <button action="forward">&#x2191;</button>
