@@ -30,7 +30,12 @@ const (
 )
 
 type Gauss float32
-type Compass struct {
+
+type Compass interface {
+	Read() (*CompassData, error)
+}
+
+type RaspiCompass struct {
 	I2CPort byte
 	Address byte
 	Scale   Gauss
@@ -42,14 +47,14 @@ type CompassData struct {
 	X, Y, Z int
 }
 
-func NewCompass(i2cPort byte, address byte, scale Gauss) *Compass {
+func NewCompass(i2cPort byte, address byte, scale Gauss) Compass {
 	if scale == 0 {
 		scale = 1.3
 	}
-	return &Compass{i2cPort, address, scale, nil}
+	return &RaspiCompass{i2cPort, address, scale, nil}
 }
 
-func (c Compass) Read() (*CompassData, error) {
+func (c RaspiCompass) Read() (*CompassData, error) {
 	if err := c.initialize(); err != nil {
 		return nil, err
 	}
@@ -61,7 +66,7 @@ func (c Compass) Read() (*CompassData, error) {
 	return &CompassData{int(x), int(y), int(z)}, nil
 }
 
-func (c Compass) readRegUInt16(reg byte) (int16, error) {
+func (c RaspiCompass) readRegUInt16(reg byte) (int16, error) {
 	c.bus.WriteByte(reg)
 	buf := make([]byte, 2)
 	if _, err := c.bus.Read(buf); err != nil {
@@ -71,7 +76,7 @@ func (c Compass) readRegUInt16(reg byte) (int16, error) {
 	return value, nil
 }
 
-func (c *Compass) initialize() error {
+func (c *RaspiCompass) initialize() error {
 	if c.bus == nil {
 		var err error
 		if c.bus, err = i2c.New(c.Address, int(c.I2CPort)); err != nil {
