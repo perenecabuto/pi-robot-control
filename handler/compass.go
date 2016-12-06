@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"../device"
@@ -12,20 +13,27 @@ type CompassPayload struct {
 	X, Y, Z   int
 }
 
-var compass *device.Compass
+type CompassHandler struct {
+	compass device.Compass
+}
 
-func CompassHandler(w http.ResponseWriter, r *http.Request) {
-	if compass == nil {
-		compass = device.NewCompass(1, 0x1e, 1.3)
-	}
-	data, err := compass.Read()
+func NewCompassHandler(c device.Compass) *CompassHandler {
+	return &CompassHandler{c}
+}
+
+func (h CompassHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	data, err := h.compass.Read()
 	if err != nil {
+		log.Println(err)
 		http.Error(w, err.Error(), 500)
 		return
 	}
 	payload := &CompassPayload{device.North, data.X, data.Y, data.Z}
 	if resp, err := json.Marshal(payload); err == nil {
-		w.Write(resp)
+		w.Header().Set("Content-Type", "application/json")
+		if i, err := w.Write(resp); err != nil {
+			log.Println("Error - writen(", i, ")", err)
+		}
 	} else {
 		http.Error(w, err.Error(), 500)
 	}

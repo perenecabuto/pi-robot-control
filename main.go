@@ -40,10 +40,14 @@ func main() {
 		log.Println(err.Error())
 	}
 
-	robotHandler := handler.NewRobotHandler(robot)
-	http.Handle("/control/", robotHandler.ListenWS())
-	http.Handle("/robot/look-to/", robotHandler.LookToHandler())
-	http.HandleFunc("/compass/", handler.CompassHandler)
+	robotH := handler.NewRobotHandler(robot)
+	http.Handle("/control/", robotH.ListenWS())
+	http.Handle("/robot/look-to/", robotH.LookToHandler())
+
+	compass := device.NewCompass(1, 0x1e, 1.3)
+	compassH := handler.NewCompassHandler(compass)
+	http.Handle("/compass/", compassH)
+
 	http.HandleFunc("/", handler.IndexHandler)
 
 	cam := device.NewWebCam(uint32(*FrameTimeout), *CameraDevice)
