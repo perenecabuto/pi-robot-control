@@ -29,7 +29,7 @@ func main() {
 		if ipin, err := strconv.Atoi(pin); err == nil {
 			pins[i] = uint8(ipin)
 		} else {
-			panic("ERROR - Pins must be a list of four ints separated by comma: " + err.Error())
+			log.Fatal("ERROR - Pins must be a list of four ints separated by comma: " + err.Error())
 		}
 	}
 	log.Println("WheelPins", pins)
@@ -62,5 +62,5 @@ func main() {
 
 	robot.Look.To(90, 90)
 	log.Println("Starting server on:", *serverAddress)
-	log.Panic(http.ListenAndServe(*serverAddress, nil))
+	log.Fatal(http.ListenAndServe(*serverAddress, nil))
 }
