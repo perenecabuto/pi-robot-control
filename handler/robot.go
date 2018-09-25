@@ -7,15 +7,17 @@ import (
 	"strconv"
 	"strings"
 
-	"../device"
+	"github.com/perenecabuto/robot-control/device"
 
 	"golang.org/x/net/websocket"
 )
 
+// RobotHandler handles robot actions
 type RobotHandler struct {
 	robot *device.Robot
 }
 
+// NewRobotHandler create a new handler for the robot
 func NewRobotHandler(r *device.Robot) *RobotHandler {
 	return &RobotHandler{r}
 }
@@ -34,6 +36,7 @@ func (h RobotHandler) LookToHandler() http.HandlerFunc {
 	})
 }
 
+// ListenWS stabilish a websocket connection to robot controls
 func (h RobotHandler) ListenWS() websocket.Handler {
 	return websocket.Handler(func(ws *websocket.Conn) {
 		log.Println("New WS connection from:" + ws.Request().Host)

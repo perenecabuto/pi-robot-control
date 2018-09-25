@@ -9,6 +9,7 @@ import (
 	"time"
 )
 
+// MJPEGStream streams jpeg images
 type MJPEGStream struct {
 	frame    []byte
 	fps      int
@@ -16,6 +17,7 @@ type MJPEGStream struct {
 	lock     sync.Mutex
 }
 
+// NewMJPEGStream create a MJPEGStream with FPS
 func NewMJPEGStream(fps int) *MJPEGStream {
 	return &MJPEGStream{
 		frame:    nil,

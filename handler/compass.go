@@ -8,15 +8,18 @@ import (
 	"github.com/perenecabuto/robot-control/device"
 )
 
+// CompassPayload represents the compass message
 type CompassPayload struct {
 	Direction device.Direction `json:"direction"`
 	X, Y, Z   int
 }
 
+// CompassHandler handle compass actions
 type CompassHandler struct {
 	compass device.Compass
 }
 
+// NewCompassHandler creates a new http handler for compass device
 func NewCompassHandler(c device.Compass) *CompassHandler {
 	return &CompassHandler{c}
 }

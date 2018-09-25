@@ -5,6 +5,7 @@ import (
 	"net/http"
 )
 
+// IndexHandler renders robot control web page
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	file, err := ioutil.ReadFile("webapp/index.html")
 	if err != nil {
