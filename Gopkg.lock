@@ -30,6 +30,14 @@
 
 [[projects]]
   branch = "master"
+  digest = "1:7427036b6d926b3d1fa0773771820735b35554a98296f1074df440ee30a97296"
+  name = "golang.org/x/net"
+  packages = ["websocket"]
+  pruneopts = "UT"
+  revision = "2f5d2388922f370f4355f327fcf4cfe9f5583908"
+
+[[projects]]
+  branch = "master"
   digest = "1:4c18b929ff2f30ebf16c43fd9e0755fad03b290af199c5bcd82dde4c80cf8781"
   name = "golang.org/x/sys"
   packages = ["unix"]
@@ -43,6 +51,7 @@
     "github.com/blackjack/webcam",
     "github.com/davecheney/i2c",
     "github.com/stianeikeland/go-rpio",
+    "golang.org/x/net/websocket",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1
