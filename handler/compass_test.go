@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"../device"
+	"github.com/perenecabuto/robot-control/device"
 )
 
 type FakeCompass struct {

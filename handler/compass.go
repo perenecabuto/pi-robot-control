@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"../device"
+	"github.com/perenecabuto/robot-control/device"
 )
 
 type CompassPayload struct {

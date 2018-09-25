@@ -7,8 +7,8 @@ import (
 	"strconv"
 	"strings"
 
-	"./device"
-	"./handler"
+	"github.com/perenecabuto/robot-control/device"
+	"github.com/perenecabuto/robot-control/handler"
 )
 
 var (
