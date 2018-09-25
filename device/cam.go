@@ -16,12 +16,11 @@ const (
 )
 
 type WebCam struct {
-	timeout uint32
 	address string
 }
 
-func NewWebCam(timeout uint32, address string) *WebCam {
-	return &WebCam{timeout, address}
+func NewWebCam(address string) *WebCam {
+	return &WebCam{address}
 }
 
 func (w *WebCam) Listen(fps int, onFrame func(*[]byte)) error {
@@ -49,7 +48,7 @@ func (w *WebCam) Listen(fps int, onFrame func(*[]byte)) error {
 		case <-ticker.C:
 			go onFrame(jpegFrame)
 		default:
-			err := cam.WaitForFrame(w.timeout)
+			err := cam.WaitForFrame(1)
 			if err != nil {
 				switch err.(type) {
 				case *webcam.Timeout:

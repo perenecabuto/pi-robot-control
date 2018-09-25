@@ -14,7 +14,6 @@ import (
 var (
 	CameraDevice  = flag.String("d", "/dev/video0", "Video dev path")
 	ServerAddress = flag.String("a", "0.0.0.0:8000", "Server address")
-	FrameTimeout  = flag.Int("frametimeout", 1000, "Frame timeout")
 	FPS           = flag.Int("fps", 5, "Frames per second")
 	WheelPins     = flag.String("pins", "25,27,17,22", "Wheel gpios as int separated with by comma."+
 		"The order is : <left-forward>,<right-forward>,<left back>,<right back>")
@@ -49,9 +48,9 @@ func main() {
 	http.Handle("/compass/", compassH)
 
 	http.HandleFunc("/", handler.IndexHandler)
+	stream := handler.NewMJPEGStream(*fps)
 
 	cam := device.NewWebCam(uint32(*FrameTimeout), *CameraDevice)
-	stream := handler.NewMJPEGStream(*FPS)
 	endpointOpened := false
 	go cam.Listen(*FPS, func(frame *[]byte) {
 		if !endpointOpened {
