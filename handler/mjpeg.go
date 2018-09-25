@@ -27,14 +27,18 @@ func NewMJPEGStream(fps int) *MJPEGStream {
 }
 
 func (s *MJPEGStream) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	log.Println("Stream:", r.RemoteAddr, "connected")
 	w.Header().Add("Content-Type", "multipart/x-mixed-replace;boundary="+s.boundary)
 	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
 	w.Header().Set("Pragma", "no-cache")
 	w.Header().Set("Expires", "0")
 	w.Header().Set("Last-Modified", time.Now().UTC().Format(http.TimeFormat))
+	fps, err := strconv.ParseInt(r.URL.Query().Get("fps"), 10, 32)
+	if err != nil {
+		fps = int64(s.fps)
+	}
 
-	c := time.Tick(time.Second / time.Duration(s.fps))
+	log.Println("Stream:", r.RemoteAddr, "connected - video FPS:", fps)
+	c := time.Tick(time.Second / time.Duration(fps))
 	for range c {
 		_, err := w.Write(s.frame)
 		if err != nil {

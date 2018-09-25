@@ -1,235 +1,257 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, maximum-scale=1, minimum-scale=1,user-scalable=0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.css"/> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.css"/>
     <style>
-    body {
-        text-align: center;
-        background: #eaeaea;
-        overflow: hidden
-    }
-    .widget-container {
-        text-align: center;
-        padding: 10pt;
-    }
-    .widget-container > * {
-        border: 1pt solid #eee;
-        border-radius: 5pt;
-        box-shadow: 3px 3px 10px 0px rgba(0,0,0,0.65);
-    }
-    .widget-container button:active {
-        box-shadow: 3px 3px 10px 0px rgba(0,0,0,0.9);
-    }
-    .widget-container button {
-        padding: 5pt;
-        background: #e55;
-        color: #fff;
-        width: 40pt;
-        height: 40pt;
-    }
-    .widget-container .camera-stream {
-        border-radius: 8pt;
-        display: block;
-        width: 100%;
-        min-height: 200px;
-        height: auto;
-        background: url(data:image/jpeg;base64,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);
-        background-size: 100%;
-        margin-bottom: 10px;
-    }
-    .widget-container .compass {
-        padding: 8px 0;
-        overflow: hidden;
-    }
-
-    .widget-container.camera-container {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-    }
-    .widget-container.controls-container {
-        position: absolute;
-        right: 0;
-        bottom: 0;
-    }
-    .widget-container .camera-position-control {
-        width: 100%;
-        height: 100%;
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-
-        box-shadow: none;
-        text-align: right;
-        font-weight: bold;
-        font-family: monospace;
-        text-shadow: 1px 1px 4px grey;
-    }
-
-    .widget-container .camera-position-control .camera-angle {
-        margin: 14px;
-        background: black;
-        color: ghostwhite;
-        background-color: rgba(0,0,0, 0.3);
-        padding: 14px;
-        border-radius: 5pt;
-        float: right;
-    }
-
-    @media (orientation:landscape) {
-        .widget-container {
-            vertical-align: bottom;
+        body {
+            text-align: center;
+            background: #eaeaea;
+            overflow: hidden
         }
+        .widget-container {
+            text-align: center;
+            padding: 10pt;
+        }
+        .widget-container > * {
+            border: 1pt solid #eee;
+            border-radius: 5pt;
+            box-shadow: 3px 3px 10px 0px rgba(0,0,0,0.65);
+        }
+        .widget-container button:active {
+            box-shadow: 3px 3px 10px 0px rgba(0,0,0,0.9);
+        }
+        .widget-container button {
+            padding: 5pt;
+            background: #e55;
+            color: #fff;
+            width: 40pt;
+            height: 40pt;
+        }
+        .widget-container .camera-stream {
+            border-radius: 8pt;
+            display: block;
+            width: 100%;
+            min-height: 200px;
+            height: auto;
+            background: url(data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5OjcBCgoKDQwNGg8PGjclHyU3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3N//AABEIAIMArgMBIgACEQEDEQH/xAAbAAABBQEBAAAAAAAAAAAAAAAAAQIDBAUGB//EAEAQAAIBAwIDBAcFBQYHAAAAAAECAwAEEQUhEjFBBhNRYRQiMlJxgZEjobHB0RUzQmJyNFOCkuHwBxYkJUPC8f/EABYBAQEBAAAAAAAAAAAAAAAAAAABAv/EABgRAQEBAQEAAAAAAAAAAAAAAAABEUEh/9oADAMBAAIRAxEAPwD2+ilxRQJRRiigCAwIPI1Ev2TcLH1T7J8PKpaRgGBBHOgdSVQutRhsWSO5kC8RwrE7/SpZLhYXjkB4oZTwlwdlJ5H4fqKC1RRRQUdXaRYIxDwhzIMFuQ2POlsGYSTQE8QB41YjGeInP3g/WjVnjW0bvXC7gjPXDA0lgTJdXUoA4MiNAD4c/vNBepg9aTPu7fnT3bgQt0AzTYVKRAMcnmfjQP6UlFFAtJRRQFFFFAUUVGZRnCDi8cdKCEWQQfYzSx/B8j6HNI3psSjgMU3jxZQ4+Wat0VMFeO4IUGaN4yRuOYB+VTJLG/surfA07AIwRVeW0jdgwUcQ5HkR8xQWKKwry5vtKmDIWvIHcKYWGGXJ5q3h8fDmK1LK+gvEJhf1l2dG2ZD5irofcwCePhJ4WG6t7p8a5uOW6g1G4gIia0ccMkZUgo58D1X9a6qsLtTpM9/ambT5zb3sYJR1/i/lNSjN7LduLDVJ7qwm7yGaylMDzOPspSDjIb9cV14INeZ6RoMVjoltZwEs88eXmcAEz9eL+o5G9dFo+pS2bQ29xx9yx4Dnmjch8qaNjXtP/aFmqCZ4mV1YFBzwRsR4bVcsoFt7dY1JO5JJ6nO9Je8ZtJO6bgcLlWxnB+FLaMxtoy25KjFUEjK8qQ539ojwA/1qaqdjILlpLpSDG54YyPdG345q7zoEoopaBKKU0hIA3oCkZlTnuTyA603jL7INveNKkarnmSeZNA3haT2hwr7o61IFAGANqWkoFoxURMg5AGjvWHtLU0SYpaiFwhzz257U4SpjPGuPjVDioNZq6RCkssylkld+PjU4IwNh8MknHiTWgJUJwGGcZp9BQS4mt/UvRlQcd8owP8Q6Vbf7SJuBsEggNjlTyoIIIyPCsu8t7m0zNpihwN3tXbCsP5fdP3VBVtLY6fIYZDLLFKSzSynOJDt06H9Kye2Npb29hc6hNxrAq/aiMew3Tl0Jxvzrb0/V7HUIpyved9H++tJlAljPLBX8+VCILq3ngljLq6kFZQD3o+e2Ry+lA3StVOp9mINQKAzSQ5eNTycbMPqDU+oTPPpFwlk47+SMRoyn2WbbOfLOa53SpjaWGp2cad21vLxdyAAVBAyMfI8vGtWaTUeOMjT3eCKTiLPKAxz1AG+Bk7c/jQbFtHDbwRWsGyRIEG2wAqPVNRt9MsXurmQrGo/hGSx8AOpqpFqMRL+kQzRsTlUZGVmPgBtk02PSkvmW71RDM+D3cEuGSIHHTkW8/pQclpX/ABEvb/UpYU7Oaj3S8mQK2/n6wrq7TX5pv3mianEQOcghGT5YkNW5JbOxeOFEXvm2SCJdz15dPiaf6PPdAekt3Uf9zEcZ/qbr8B99UQWutLd3LW9vbziRPb7xPVX5gmtDuy27HPgPCnQwRQRiOJFRByUDAp5IXckAedQKAAKKYJFJwp4vgKeKoKSlNJQFLSUuaBCB4Ux4EYEEZzUlFBROnqP3bFOXssRj8qdEtxAhVnaUdC+M/dVyigzDqqwswvIpIEV+ASEAq2Rnp+dWIL62u047a4jlX3o3BxUOsRx3On3UI7t5OAgAsMqcY+R3rzvtHex3usWun6fMsEJk/wCpvnkwUjUDKRnkPAnp8d6g7vV9GttRnSYNJbXsW0d3FhXXxH8w8QaWIPqNnLaSqiTxAFJkX1M78LAdOW6+Fc5Nq2n2Q4LftAiAJxKxczFt99znbp+lbfYnVI9W0dZzcWsl05LTLA26Z9kMMnBxjagh0rsibaZ7i/1K4uZ5UCyrGBFGd88h63PxY10rkIpZiABuafWbrWnz6lEkEd21tFxBpOBAWbB5b7Y+RoKMet2voyX10zKJFzDEAeIg9AvU8uVZz69qF7qi2EcD2Ec6FopJMcbgc8dB089+lQf8kXyatPep2huO5JLRwNBGxXI5cTA9fACn3tra3UTrqBvRPaxCRZixDjfGABgY2G3Wg37KWz06GOGa4jE7DiYF+J2PU+J+NaJcn2UJ8ztWboVvbJaRtBbRxnByVQDJzz+da1IIeCdmyXVV90D8/wDSlMKt7XrHnvvUtFUG1JS0lAUUUUBRRRQKKKKKBrKWB9Y1VmhghieSR2WNFJJ4jgAUk89wLgokSiMD2yTknwxioriylv4+7uJXERILKh4c46ZG/wB9QeR9mtNg7R9odZ1PUL+URW2ovHHarJzHNdiDtj8PjnvrW0gsCWstFkJyVHrgKQeu+4G/h+Fa6waN2fgVT6PaRtsB7JY/ix+tQS3+pXkQGk2qQqTtNcjfHiF+nM/KoOH7Y3U1jrcdiyafbvPB3rdzal23bhA4yRvt4eO1J2W0Ga045eyaXhn9RWvLwqsWBk8PDjJHrk4Ax58q27zS5YUXUp4ZNR1tlwneyCJFHL1zyVcn2Rueg3NUuzM2p9nNQn/bsqXE2oJxQCHKxs2fVGP4d2IHkud801XpYNLXNdjdZ1LUrW7GtwQQ3NvdNADFkK+ADsD4ZI88ZrXXVrFr42S3MRugSO6zvkDJ+4itIunlXNIL1sSrNEYp5XPdzx8RC8RxjBGB7POujlXjjZckcQxkcxXE6pfLY60kOpSILIIArB8RHh9/qrZx14duh2qUb1ncXnEIFgtAoX1THPxD6c6kh1kYka4tpYFjbhLOQRn5Z2qzZXKXKcSLw42ZDjKnzxT4rKJJJZDljKcsCBjljoPxqAtr+1uiRBPGzA4IVgatZrOn0PS7iRHmsoXdDlWK7g1ObJVx3EssOOXA+30ORVFrNFUil9G+UliljxydMN9R+lPF06/vrd18SpBH5VRZoqJbqFv48eTDH41Ijq4yrBgeoNAtFFFAUVBJdIh4UBkf3V/M9KiMd1cbSydypHsRncfE/pigZNfw2rOjs0kpf1I4xxOduWBy+e1Z4vNT1Kbu4IxZ2+MO+Q0oJB+Q6cs+NbMNrBCpEcYGTk+Z8ahuLYrKJ7f1ZgN88nHun9en1zBFY6Rb2o4iDNKfblk3Z8csmrVwSVC7BSQCSM0sFwk0YdduhU81PUGnMeIEDHzoMzWmU2rxZIXI4m543z+WawBaQ3ls2pelSQx28XFC0i57lFBIbzJGfHY9MmtqAHU7+Ve7HokOzFv43IHLyx+PxrM/4g97caWNFtN5b0EyDmBCmC2f6vVTx9Y+FQeb9l9P1O97Q6T2nljY3M0891L3+cMOFguAORwQOXMDHWvTIorZ7TUb4xvHMbnvGcEEqyhSD5Abf7NZXZKKe71GRZXChLTjhEa4ERZzv5/u/oK6nS+7ZLohQDI4LrjrwhSD/lx8qmqy9f1mZ9Fs5LOMTSuBLPArlWMQzxY3GMnlk1r2kVpNZR+jqptpEHCMbEEcsfrXKaLaW9x2p1bT7iBgkMnEgDYBUgHHjjcnHLeuwWFbGUCMKlu+F4QMBW8fn+OPGrPSzFGLTf2ajehBu5UHu41beIeCE8x/KdvDFX9OvDOnDJjvAccQ2DfLofEHlVvAxg1VuLPiYywtwS4xkdfI+I/2MURdFBqvDMy4WcAN7w5H9KnBDDI3BqwLRRRVDGhjbmo+VV2062LEhAufdGKt0UFZrtSeGBTKT1Hs/X9KTuJpg3pD+qeSJsP9asKgXkMfCnUDI41jGEUD4U+iigKDyoooKUkbx3HexAEMftV94eI8x9/0qKPULa+t/wDtlzDM7sUBRgeEg4YkeXgfhVu5kSCNpZSFjQZYnoKy+z2kQWkt7qK2kdtc6hL3kiKuCowMA+fU+ZPhWYrTtreOytVghyFQc2OT5k1xtvLd6xd3WpwxM1vK/dgE8BManCqpI65LH+ojpt0HaZvSLRdLVnV78mFmjJDImMucjlttnzrlNYGtdmbd/SJ5b/R41Cx4ISWI9OLHt5J64pSR1PZ9knlu7gW0lsy8Fu0T49XgydiOY9fnV62j7rULkAHhfhbyG3/2s3sOgHZ6KVTIRNI8gMvtYLHH3DatMSSftV12MXdgeYbn+BpwrJeM2vbEyoBi4tMnJxupwT9OGugkjSZCkg4lPMGqF9AH1Owm93vE8OYB/wDWtEchmkKjizujbsvXxHjUmMU2UEDjHNd8ePlTkYOoZTkEZFaQFQRgioIrb0dFS39VF5ITtViigYsgLcJHC3hT6RlVvaANMVWTYZYeZ3qCSimqwbOOlOqgooooCiiigKa7cIzTqjdSxHxqUVJbeS8uY+9x6LEQ/D/eP0z5Dn5n4VfoAwMCorlykLFRljso8SdhTBy+r6Xd3+pnU7WWYS22YoFjnMWV/i33HPxBGwrO12LtSukd53UF5BH681tcuod8HY8aKBkbHlg4ru44xHGqLyA6dah1LeylUf8AkxH/AJjj86mLqLRITBo9nEYxEVhXiQHIBxvvSELHqx2/eqM+RAP5VfAAGBVeWMG6hcYDDPzGKqI9RGO4kOMxyqRnz2/OrlVtRQPaODvjDfQg/lVkHIB8aQBqFPsnKYwjbr5HqKmpsicakDnzB86odRTY24l3GCNiKdQFFFFA1kDHPIjrSDjGxAPnT6KAooooCiiigKKKKAqGbea3B5cR2/wmiigmqC6AJgBGR3o/WlooJqa3MGiioI7z+zS/0GpU9gfCiinVLRRRVREv9oI8Vz99S0UUC9KSiigKKKKD/9k=);
+            background-size: 100%;
+            margin-bottom: 10px;
+        }
+        .widget-container .compass {
+            padding: 8px 0;
+            overflow: hidden;
+        }
+
         .widget-container.camera-container {
-            max-width: 55%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
         }
-        .widget-container.camera-container img {
-            max-width: 100%;
+        .widget-container.panel-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
         }
-    }
+        .widget-container.controls-container {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+        }
+        .widget-container .camera-position-control {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
 
-    @media (min-height:504px) and (min-width: 425px), (min-height:425px) and (min-width:504px) {
-        .widget-container {
-            margin-top: 0;
+            box-shadow: none;
+            text-align: right;
+            font-weight: bold;
+            font-family: monospace;
+            text-shadow: 1px 1px 4px grey;
         }
-        .widget-container.controls-container button {
-            width: 50pt;
-            height: 50pt;
-            margin: 5pt;
-            margin: 0 10pt 10pt 0;
+
+        .widget-container .camera-position-control .camera-angle {
+            margin: 14px;
+            background: black;
+            color: ghostwhite;
+            background-color: rgba(0,0,0, 0.3);
+            padding: 14px;
+            border-radius: 5pt;
+            float: right;
         }
-    }
+
+        @media (orientation:landscape) {
+            .widget-container {
+                vertical-align: bottom;
+            }
+            .widget-container.camera-container {
+                max-width: 55%;
+            }
+            .widget-container.camera-container img {
+                max-width: 100%;
+            }
+        }
+
+        @media (min-height:504px) and (min-width: 425px), (min-height:425px) and (min-width:504px) {
+            .widget-container {
+                margin-top: 0;
+            }
+            .widget-container.controls-container button {
+                width: 50pt;
+                height: 50pt;
+                margin: 5pt;
+                margin: 0 10pt 10pt 0;
+            }
+        }
     </style>
 
     <script>
-    var ws = new WebSocket("ws://" + location.host + "/control/");
+        var ws = new WebSocket("ws://" + location.host + "/control/");
 
-    function move(action) {
-        ws.send("move-"+action);
-    }
+        function move(action) {
+            ws.send("move-"+action);
+        }
 
-    function updateCompass() {
-        fetch("/compass").then(function(response) {
-            response.json().then(function(compass) {
-                document.getElementById("compass").innerText =
-                " x:" + compass.X +
-                " y:" + compass.Y +
-                " z:" + compass.Z +
-                " direction:" + compass.direction;
+        function updateCompass() {
+            fetch("/compass").then(function(response) {
+                response.json().then(function(compass) {
+                    document.getElementById("compass").innerText =
+                    " x:" + compass.X +
+                    " y:" + compass.Y +
+                    " z:" + compass.Z +
+                    " direction:" + compass.direction;
+                });
+            });
+        }
+
+        var compassEnabled = false;
+        function autoUpdateCompass() {
+            if (compassEnabled) {
+                updateCompass();
+            }
+            setTimeout(autoUpdateCompass, 1000);
+        }
+
+        autoUpdateCompass();
+
+        function lookTo(xAngle, yAngle) {
+            document.getElementById("camera-angle").innerText = " angle:"+xAngle+","+yAngle;
+            ws.send("look-to:"+xAngle+":"+yAngle);
+        }
+
+        function bindMove(el, action) {
+            var startfn = function(e) {
+                move(action);
+                e.preventDefault();
+            };
+            var stopfn = function(e) {
+                el.blur();
+                move('stop');
+                e.preventDefault();
+            };
+
+            el.addEventListener("mousedown", startfn, false);
+            el.addEventListener("touchstart", startfn, false);
+            el.addEventListener("mouseup", stopfn, false);
+            el.addEventListener("touchend", stopfn, false);
+            el.addEventListener("touchcancel", stopfn, false);
+        }
+
+        function bindCamControls(camControlsEl) {
+            var camStartMove = false;
+            var timeoutHandler;
+            var startfn = function(e) {
+                e.preventDefault();
+                clearTimeout(timeoutHandler);
+                camStartMove = true;
+                return false;
+            };
+            var looktofn = function(e) {
+                if (!camStartMove) return false;
+                var x = e.changedTouches !== undefined ? e.changedTouches[0].pageX : e.pageX;
+                var y = e.changedTouches !== undefined ? e.changedTouches[0].pageY : e.pageY;
+                var xAngle = parseInt((x * 180) / camControlsEl.offsetWidth);
+                var yAngle = parseInt((y * 180) / camControlsEl.offsetHeight);
+                xAngle = 180 - xAngle; // Invert x direction
+
+                lookTo(xAngle, yAngle);
+            };
+            var endfn = function(e) {
+                camStartMove = false;
+                timeoutHandler = setTimeout(centerfn, 2000);
+            };
+            var centerfn = function() {
+                lookTo(87, 90);
+                return false;
+            };
+            camControlsEl.addEventListener("mousedown", startfn);
+            camControlsEl.addEventListener("touchstart", startfn);
+            camControlsEl.addEventListener("mousemove", looktofn);
+            camControlsEl.addEventListener("touchmove", looktofn);
+            camControlsEl.addEventListener("mouseup", endfn);
+            camControlsEl.addEventListener("touchend", endfn);
+            camControlsEl.addEventListener("touchcancel", endfn);
+            camControlsEl.addEventListener("touchleave", endfn);
+            camControlsEl.addEventListener("dblclick", centerfn);
+        }
+
+        window.document.addEventListener("keydown", function(event) {
+            switch (event.key) {
+                case "ArrowLeft":
+                move("left");
+                break;
+                case "ArrowRight":
+                move("right");
+                break;
+                case "ArrowUp":
+                move("forward");
+                break;
+                case "ArrowDown":
+                move("backward");
+                break;
+            }
+        });
+
+        window.document.addEventListener("keyup", function(event) {
+            move("stop");
+        });
+
+        window.addEventListener("DOMContentLoaded", function() {
+            var updateCameraSrc = function(fps) {
+                document.getElementById("camera").src = "/camera?fps=" + fps;
+            };
+
+            var fpsInput = document.getElementById("fps");
+            fpsInput.addEventListener("change", function() {
+                updateCameraSrc(this.value);
+            });
+            updateCameraSrc(fpsInput.value);
+
+            var fallback = function() {
+                var baseURL = window.location.origin.replace(/:\d+/, "");
+                this.src = baseURL + ":8080/?action=stream";
+                cameraMJPEGEl.removeEventListener("error", fallback);
+            };
+
+            var camControls = document.getElementById("camera-control");
+            bindCamControls(camControls);
+
+            var buttons = document.getElementsByTagName("button");
+            for (var i = 0; i < buttons.length; i++) {
+                var b = buttons[i];
+                if (b !== undefined && b.attributes.action !== undefined) {
+                    bindMove(b, b.attributes.action.value);
+                }
+            }
+
+            document.getElementById("compass-toggle").addEventListener("change", function() {
+                compassEnabled = this.checked;
             });
         });
-    }
-
-    function autoUpdateCompass() {
-        updateCompass();
-        setTimeout(autoUpdateCompass, 1000);
-    }
-
-    autoUpdateCompass();
-
-    function lookTo(xAngle, yAngle) {
-        document.getElementById("camera-angle").innerText = " angle:"+xAngle+","+yAngle;
-        ws.send("look-to:"+xAngle+":"+yAngle);
-    }
-
-    function bindMove(el, action) {
-        var startfn = function(e) {
-            move(action);
-            e.preventDefault();
-        };
-        var stopfn = function(e) {
-            el.blur();
-            move('stop');
-            e.preventDefault();
-        };
-
-        el.addEventListener("mousedown", startfn, false);
-        el.addEventListener("touchstart", startfn, false);
-        el.addEventListener("mouseup", stopfn, false);
-        el.addEventListener("touchend", stopfn, false);
-        el.addEventListener("touchcancel", stopfn, false);
-    }
-
-    function bindCamControls(camControlsEl) {
-        var camStartMove = false;
-        var timeoutHandler;
-        var startfn = function(e) {
-            e.preventDefault();
-            clearTimeout(timeoutHandler);
-            camStartMove = true;
-            return false;
-        };
-        var looktofn = function(e) {
-            if (!camStartMove) return false;
-            var x = e.changedTouches !== undefined ? e.changedTouches[0].pageX : e.pageX;
-            var y = e.changedTouches !== undefined ? e.changedTouches[0].pageY : e.pageY;
-            var xAngle = parseInt((x * 180) / camControlsEl.offsetWidth);
-            var yAngle = parseInt((y * 180) / camControlsEl.offsetHeight);
-            xAngle = 180 - xAngle; // Invert x direction
-
-            lookTo(xAngle, yAngle);
-        };
-        var endfn = function(e) {
-            camStartMove = false;
-            timeoutHandler = setTimeout(centerfn, 2000);
-        };
-        var centerfn = function() {
-            lookTo(87, 90);
-            return false;
-        };
-        camControlsEl.addEventListener("mousedown", startfn);
-        camControlsEl.addEventListener("touchstart", startfn);
-        camControlsEl.addEventListener("mousemove", looktofn);
-        camControlsEl.addEventListener("touchmove", looktofn);
-        camControlsEl.addEventListener("mouseup", endfn);
-        camControlsEl.addEventListener("touchend", endfn);
-        camControlsEl.addEventListener("touchcancel", endfn);
-        camControlsEl.addEventListener("touchleave", endfn);
-        camControlsEl.addEventListener("dblclick", centerfn);
-    }
-
-    window.document.addEventListener("keydown", function(event) {
-        switch (event.key) {
-        case "ArrowLeft":
-            move("left");
-            break;
-        case "ArrowRight":
-            move("right");
-            break;
-        case "ArrowUp":
-            move("forward");
-            break;
-        case "ArrowDown":
-            move("backward");
-            break;
-        }
-    });
-
-    window.document.addEventListener("keyup", function(event) {
-        move("stop");
-    });
-
-    window.addEventListener("DOMContentLoaded", function() {
-        var fallback = function() {
-            var baseURL = window.location.origin.replace(/:\d+/, "");
-            this.src = baseURL + ":8080/?action=stream";
-            document.getElementById("camera").removeEventListener("error", fallback);
-        };
-
-        var camControls = document.getElementById("camera-control");
-        bindCamControls(camControls);
-
-        var buttons = document.getElementsByTagName("button");
-        for (var i = 0; i < buttons.length; i++) {
-            var b = buttons[i];
-            if (b !== undefined && b.attributes.action !== undefined) {
-                bindMove(b, b.attributes.action.value);
-            }
-        }
-    });
 
     </script>
 </head>
@@ -240,7 +262,16 @@
         <div id="camera-control" class="camera-position-control">
             <div id="camera-angle" class="camera-angle"></div>
         </div>
+
         <pre id="compass" class="compass">loading compass...</pre>
+    </div>
+
+    <div class="widget-container panel-container">
+        <label for="fps">FPS</label>
+        <input type="number" id="fps" value="10" placeholder="FPS"/>
+
+        <label for="compass-toggle">Compass</label>
+        <input type="checkbox" id="compass-toggle" />
     </div>
 
     <div id="controls-container" class="widget-container controls-container">
