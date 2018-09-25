@@ -15,7 +15,7 @@ type FakeCompass struct {
 }
 
 func (c FakeCompass) Read() (*device.CompassData, error) {
-	return &device.CompassData{c.X, c.Y, c.Z}, nil
+	return &device.CompassData{X: c.X, Y: c.Y, Z: c.Z}, nil
 }
 
 func TestCompassHandler(t *testing.T) {
