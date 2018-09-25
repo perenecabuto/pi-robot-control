@@ -12,10 +12,10 @@ import (
 )
 
 var (
-	CameraDevice  = flag.String("d", "/dev/video0", "Video dev path")
-	ServerAddress = flag.String("a", "0.0.0.0:8000", "Server address")
-	FPS           = flag.Int("fps", 5, "Frames per second")
-	WheelPins     = flag.String("pins", "25,27,17,22", "Wheel gpios as int separated with by comma."+
+	cameraDevice  = flag.String("d", "/dev/video0", "Video dev path")
+	serverAddress = flag.String("a", "0.0.0.0:8000", "Server address")
+	fps           = flag.Int("fps", 30, "Frames per second")
+	wheelPins     = flag.String("pins", "25,27,17,22", "Wheel gpios as int separated with by comma."+
 		"The order is : <left-forward>,<right-forward>,<left back>,<right back>")
 )
 
@@ -23,7 +23,7 @@ func main() {
 	flag.Parse()
 
 	pins := make([]uint8, 4, 4)
-	for i, pin := range strings.SplitN(*WheelPins, ",", 4) {
+	for i, pin := range strings.SplitN(*wheelPins, ",", 4) {
 		if ipin, err := strconv.Atoi(pin); err == nil {
 			pins[i] = uint8(ipin)
 		} else {
@@ -45,23 +45,16 @@ func main() {
 
 	compass := device.NewCompass(1, 0x1e, 1.3)
 	compassH := handler.NewCompassHandler(compass)
-	http.Handle("/compass/", compassH)
 
-	http.HandleFunc("/", handler.IndexHandler)
+	cam := device.NewWebCam(*cameraDevice)
 	stream := handler.NewMJPEGStream(*fps)
+	go cam.Listen(*fps, stream.UpdateJPEG)
 
-	cam := device.NewWebCam(uint32(*FrameTimeout), *CameraDevice)
-	endpointOpened := false
-	go cam.Listen(*FPS, func(frame *[]byte) {
-		if !endpointOpened {
-			log.Println("Open camera endpoint")
-			http.Handle("/camera", stream)
-			endpointOpened = true
-		}
-		stream.UpdateJPEG(frame)
-	})
+	http.Handle("/camera", stream)
+	http.Handle("/compass/", compassH)
+	http.HandleFunc("/", handler.IndexHandler)
 
 	robot.Look.To(90, 90)
-	log.Println("Starting server on:", *ServerAddress)
-	log.Panic(http.ListenAndServe(*ServerAddress, nil))
+	log.Println("Starting server on:", *serverAddress)
+	log.Panic(http.ListenAndServe(*serverAddress, nil))
 }
