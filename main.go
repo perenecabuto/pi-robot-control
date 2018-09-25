@@ -12,10 +12,12 @@ import (
 )
 
 var (
-	cameraDevice  = flag.String("d", "/dev/video0", "Video dev path")
-	serverAddress = flag.String("a", "0.0.0.0:8000", "Server address")
-	fps           = flag.Int("fps", 30, "Frames per second")
-	wheelPins     = flag.String("pins", "25,27,17,22", "Wheel gpios as int separated with by comma."+
+	cameraDevice   = flag.String("d", "/dev/video0", "Video dev path")
+	serverAddress  = flag.String("a", "0.0.0.0:8000", "Server address")
+	maxFrameWidth  = flag.Uint("frame-width", 320, "frame max width")
+	maxFrameHeight = flag.Uint("frame-height", 240, "frame max height")
+	fps            = flag.Int("fps", 30, "Frames per second")
+	wheelPins      = flag.String("pins", "25,27,17,22", "Wheel gpios as int separated with by comma."+
 		"The order is : <left-forward>,<right-forward>,<left back>,<right back>")
 )
 
@@ -46,10 +48,14 @@ func main() {
 	compass := device.NewCompass(1, 0x1e, 1.3)
 	compassH := handler.NewCompassHandler(compass)
 
-	cam := device.NewWebCam(*cameraDevice)
+	cam := device.NewWebCam(*cameraDevice, []uint32{uint32(*maxFrameWidth), uint32(*maxFrameHeight)})
 	stream := handler.NewMJPEGStream(*fps)
-	go cam.Listen(*fps, stream.UpdateJPEG)
-
+	go func() {
+		err := cam.Listen(*fps, stream.UpdateJPEG)
+		if err != nil {
+			log.Fatal("Could not start stream:", err.Error())
+		}
+	}()
 	http.Handle("/camera", stream)
 	http.Handle("/compass/", compassH)
 	http.HandleFunc("/", handler.IndexHandler)

@@ -2,6 +2,7 @@ package device
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"sort"
 	"strings"
@@ -10,19 +11,20 @@ import (
 	"github.com/blackjack/webcam"
 )
 
-const (
-	MAX_WIDTH  = 320
-	MAX_HEIGHT = 240
-)
+type frameSize []uint32
 
+// WebCam controller for webcam device
 type WebCam struct {
-	address string
+	address      string
+	maxFrameSize frameSize
 }
 
-func NewWebCam(address string) *WebCam {
-	return &WebCam{address}
+// NewWebCam creates a WebCam on device address
+func NewWebCam(address string, maxFrameSize frameSize) *WebCam {
+	return &WebCam{address, maxFrameSize}
 }
 
+// Listen to webcam frames
 func (w *WebCam) Listen(fps int, onFrame func([]byte)) error {
 	cam, err := webcam.Open(w.address) // Open webcam
 	if err != nil {
@@ -30,7 +32,7 @@ func (w *WebCam) Listen(fps int, onFrame func([]byte)) error {
 	}
 	defer cam.Close()
 
-	format, err := setupCamImageFormat(cam)
+	format, err := setupCamImageFormat(cam, w.maxFrameSize[0], w.maxFrameSize[1])
 	if err != nil {
 		return err
 	}
@@ -80,8 +82,12 @@ type CamPixelFormat struct {
 	Height uint32
 }
 
-func (f CamPixelFormat) IsJPEG() bool {
+func (f *CamPixelFormat) IsJPEG() bool {
 	return strings.Contains(f.Name, "JPEG")
+}
+
+func (f *CamPixelFormat) String() string {
+	return fmt.Sprintf("format: %s, dimensions: %dx%d", f.Name, f.Width, f.Height)
 }
 
 type SortedSizes []webcam.FrameSize
@@ -98,7 +104,7 @@ func (s SortedSizes) Swap(i, j int) {
 	s[i], s[j] = s[j], s[i]
 }
 
-func setupCamImageFormat(cam *webcam.Webcam) (*CamPixelFormat, error) {
+func setupCamImageFormat(cam *webcam.Webcam, maxWidth, maxHeight uint32) (*CamPixelFormat, error) {
 	log.Println("Supported formats:", cam.GetSupportedFormats())
 
 	var format webcam.PixelFormat
@@ -115,16 +121,17 @@ func setupCamImageFormat(cam *webcam.Webcam) (*CamPixelFormat, error) {
 	}
 
 	supportedSizes := SortedSizes(cam.GetSupportedFrameSizes(format))
-	log.Println("Supported sizes:", supportedSizes)
 	sort.Sort(supportedSizes)
+	log.Println("Supported sizes:", supportedSizes)
+
 	size := supportedSizes[0]
 
 	found.Width, found.Height = size.MaxWidth, size.MaxHeight
-	if found.Width > MAX_WIDTH {
-		found.Width = MAX_WIDTH
+	if found.Width > maxWidth {
+		found.Width = maxWidth
 	}
-	if found.Height > MAX_HEIGHT {
-		found.Height = MAX_HEIGHT
+	if found.Height > maxHeight {
+		found.Height = maxHeight
 	}
 	_, _, _, err := cam.SetImageFormat(format, found.Width, found.Height)
 
