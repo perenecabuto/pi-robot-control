@@ -4,6 +4,7 @@ import "github.com/davecheney/i2c"
 
 type Direction string
 
+// Compass Default values
 const (
 	North Direction = "North"
 	West  Direction = "East"
