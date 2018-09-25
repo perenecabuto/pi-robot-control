@@ -43,11 +43,12 @@ func (s *MJPEGStream) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	log.Println("Stream:", r.RemoteAddr, "disconnected")
 }
 
-func (s *MJPEGStream) UpdateJPEG(jpeg *[]byte) {
+// UpdateJPEG set the current jpeg frame
+func (s *MJPEGStream) UpdateJPEG(jpeg []byte) {
 	if jpeg == nil {
 		return
 	}
-	jpegLen := len(*jpeg)
+	jpegLen := len(jpeg)
 	header := s.buildHeader(jpegLen)
 	if s.frame == nil || len(s.frame) < jpegLen+len(header) {
 		s.frame = make([]byte, (jpegLen+len(header))*2)
@@ -55,11 +56,11 @@ func (s *MJPEGStream) UpdateJPEG(jpeg *[]byte) {
 
 	s.lock.Lock()
 	copy(s.frame, header)
-	copy(s.frame[len(header):], *jpeg)
+	copy(s.frame[len(header):], jpeg)
 	s.lock.Unlock()
 }
 
-func (s MJPEGStream) buildHeader(length int) string {
+func (s *MJPEGStream) buildHeader(length int) string {
 	return "\r\n" +
 		"--" + s.boundary + "\r\n" +
 		"Content-Type: image/jpeg\r\n" +

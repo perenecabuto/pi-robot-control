@@ -23,7 +23,7 @@ func NewWebCam(address string) *WebCam {
 	return &WebCam{address}
 }
 
-func (w *WebCam) Listen(fps int, onFrame func(*[]byte)) error {
+func (w *WebCam) Listen(fps int, onFrame func([]byte)) error {
 	cam, err := webcam.Open(w.address) // Open webcam
 	if err != nil {
 		return err
@@ -41,7 +41,7 @@ func (w *WebCam) Listen(fps int, onFrame func(*[]byte)) error {
 	}
 
 	ticker := time.NewTicker(time.Second / time.Duration(fps))
-	var jpegFrame *[]byte
+	var jpegFrame []byte
 
 	for {
 		select {
@@ -61,7 +61,7 @@ func (w *WebCam) Listen(fps int, onFrame func(*[]byte)) error {
 			frame, err := cam.ReadFrame()
 			if len(frame) != 0 {
 				if format.IsJPEG() {
-					jpegFrame = &frame
+					jpegFrame = frame
 				} else {
 					jpegFrame, err = CompressImageToJpeg(frame, format.Width, format.Height)
 					if err != nil {
@@ -72,8 +72,6 @@ func (w *WebCam) Listen(fps int, onFrame func(*[]byte)) error {
 			}
 		}
 	}
-
-	return nil
 }
 
 type CamPixelFormat struct {

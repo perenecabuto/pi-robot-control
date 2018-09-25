@@ -7,11 +7,12 @@ package device
 import "C"
 import "unsafe"
 
-func CompressImageToJpeg(frame []byte, width uint32, height uint32) (*[]byte, error) {
+// CompressImageToJpeg YUYV images to JPEG
+func CompressImageToJpeg(frame []byte, width uint32, height uint32) ([]byte, error) {
 	jpeg := make([]byte, len(frame), len(frame))
 	C.compressYUYVtoJPEG(
 		(*C.uint8_t)(unsafe.Pointer(&frame[0])), (*C.uint8_t)(unsafe.Pointer(&jpeg[0])),
 		(C.uint32_t)(width), (C.uint32_t)(height),
 	)
-	return &jpeg, nil
+	return jpeg, nil
 }
