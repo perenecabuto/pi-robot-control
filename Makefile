@@ -32,7 +32,7 @@ copy-ssh-key:
 	ssh-copy-id -i ~/.ssh/id_rsa.pub $(USER)@$(HOST)
 
 .PHONY=cross-arm
-cross-arm:
+cross-arm: libjpeg-arm install-libjpeg
 	CGO_ENABLED=1 CC=$(ARM_COMPILER) CGO_CFLAGS=$(CFLAGS) CGO_LDFLAGS=$(LDFLAGS) GOOS=linux GOARCH=arm go build
 
 .PHONY=deploy upload
