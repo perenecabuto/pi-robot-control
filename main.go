@@ -43,7 +43,7 @@ func main() {
 
 	robotH := handler.NewRobotHandler(robot)
 	http.Handle("/control/", robotH.ListenWS())
-	http.Handle("/robot/look-to/", robotH.LookToHandler())
+	http.Handle("/robot/look-to/", robotH.LookTo())
 
 	compass := device.NewCompass(1, 0x1e, 1.3)
 	compassH := handler.NewCompassHandler(compass)

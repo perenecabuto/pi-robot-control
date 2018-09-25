@@ -22,7 +22,8 @@ func NewRobotHandler(r *device.Robot) *RobotHandler {
 	return &RobotHandler{r}
 }
 
-func (h RobotHandler) LookToHandler() http.HandlerFunc {
+// LookTo handles camera axis messages
+func (h RobotHandler) LookTo() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		qs := r.URL.Query()
 		x, _ := strconv.Atoi(qs.Get("x"))
