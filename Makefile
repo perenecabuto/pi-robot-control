@@ -27,6 +27,10 @@ build: libjpeg-x86 install-libjpeg
 test:
 	CompileDaemon -color -command "go test ./..."
 
+.PHONY=copy-ssh-key
+copy-ssh-key:
+	ssh-copy-id -i ~/.ssh/id_rsa.pub $(USER)@$(HOST)
+
 .PHONY=cross-arm
 cross-arm:
 	CGO_ENABLED=1 CC=$(ARM_COMPILER) CGO_CFLAGS=$(CFLAGS) CGO_LDFLAGS=$(LDFLAGS) GOOS=linux GOARCH=arm go build
