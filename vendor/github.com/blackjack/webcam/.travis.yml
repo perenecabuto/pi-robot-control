@@ -1,5 +1,9 @@
 language: go
 
+before_install:
+  - sudo apt-get install libv4l-dev
+
 go:
   - tip
-  - v0.2
+  - 1.7
+  - 1.4

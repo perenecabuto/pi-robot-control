@@ -6,16 +6,16 @@ package webcam
 import (
 	"errors"
 	"golang.org/x/sys/unix"
-	"os"
 	"reflect"
 	"unsafe"
 )
 
 // Webcam object
 type Webcam struct {
-	file    *os.File
-	fd      uintptr
-	buffers [][]byte
+	fd        uintptr
+	bufcount  uint32
+	buffers   [][]byte
+	streaming bool
 }
 
 // Open a webcam with a given path
@@ -23,8 +23,8 @@ type Webcam struct {
 // capable to stream video
 func Open(path string) (*Webcam, error) {
 
-	file, err := os.OpenFile(path, unix.O_RDWR|unix.O_NONBLOCK, 0666)
-	fd := file.Fd()
+	handle, err := unix.Open(path, unix.O_RDWR|unix.O_NONBLOCK, 0666)
+	fd := uintptr(handle)
 
 	if fd < 0 || err != nil {
 		return nil, err
@@ -45,8 +45,8 @@ func Open(path string) (*Webcam, error) {
 	}
 
 	w := new(Webcam)
-	w.fd = fd
-	w.file = file
+	w.fd = uintptr(fd)
+	w.bufcount = 256
 	return w, nil
 }
 
@@ -116,22 +116,29 @@ func (w *Webcam) SetImageFormat(f PixelFormat, width, height uint32) (PixelForma
 	}
 }
 
+// Set the number of frames to be buffered.
+// Not allowed if streaming is already on.
+func (w *Webcam) SetBufferCount(count uint32) error {
+	if w.streaming {
+		return errors.New("Cannot set buffer count when streaming")
+	}
+	w.bufcount = count
+	return nil
+}
+
 // Start streaming process
 func (w *Webcam) StartStreaming() error {
+	if w.streaming {
+		return errors.New("Already streaming")
+	}
 
-	var buf_count uint32 = 256
-
-	err := mmapRequestBuffers(w.fd, &buf_count)
+	err := mmapRequestBuffers(w.fd, &w.bufcount)
 
 	if err != nil {
 		return errors.New("Failed to map request buffers: " + string(err.Error()))
 	}
 
-	if buf_count < 2 {
-		return errors.New("Insufficient buffer memory")
-	}
-
-	w.buffers = make([][]byte, buf_count, buf_count)
+	w.buffers = make([][]byte, w.bufcount, w.bufcount)
 	for index, _ := range w.buffers {
 		var length uint32
 
@@ -159,6 +166,7 @@ func (w *Webcam) StartStreaming() error {
 	if err != nil {
 		return errors.New("Failed to start streaming: " + string(err.Error()))
 	}
+	w.streaming = true
 
 	return nil
 }
@@ -167,21 +175,34 @@ func (w *Webcam) StartStreaming() error {
 // If frame cannot be read at the moment
 // function will return empty slice
 func (w *Webcam) ReadFrame() ([]byte, error) {
+	result, index, err := w.GetFrame()
+	if err == nil {
+		w.ReleaseFrame(index)
+	}
+	return result, err
+}
+
+// Get a single frame from the webcam and return the frame and
+// the buffer index. To return the buffer, ReleaseFrame must be called.
+// If frame cannot be read at the moment
+// function will return empty slice
+func (w *Webcam) GetFrame() ([]byte, uint32, error) {
 	var index uint32
 	var length uint32
 
 	err := mmapDequeueBuffer(w.fd, &index, &length)
 
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
-	result := w.buffers[int(index)][:length]
+	return w.buffers[int(index)][:length], index, nil
 
-	err = mmapEnqueueBuffer(w.fd, index)
+}
 
-	return result, err
-
+// Release the frame buffer that was obtained via GetFrame
+func (w *Webcam) ReleaseFrame(index uint32) error {
+	return mmapEnqueueBuffer(w.fd, index)
 }
 
 // Wait until frame could be read
@@ -198,8 +219,11 @@ func (w *Webcam) WaitForFrame(timeout uint32) error {
 	}
 }
 
-// Close the device
-func (w *Webcam) Close() error {
+func (w *Webcam) StopStreaming() error {
+	if !w.streaming {
+		return errors.New("Request to stop streaming when not streaming")
+	}
+	w.streaming = false
 	for _, buffer := range w.buffers {
 		err := mmapReleaseBuffer(buffer)
 		if err != nil {
@@ -207,9 +231,27 @@ func (w *Webcam) Close() error {
 		}
 	}
 
-	err := w.file.Close()
+	return stopStreaming(w.fd)
+}
+
+// Close the device
+func (w *Webcam) Close() error {
+	if w.streaming {
+		w.StopStreaming()
+	}
+
+	err := unix.Close(int(w.fd))
 
 	return err
+}
+
+// Sets automatic white balance correction
+func (w *Webcam) SetAutoWhiteBalance(val bool) error {
+	v := int32(0)
+	if val {
+		v = 1
+	}
+	return setControl(w.fd, V4L2_CID_AUTO_WHITE_BALANCE, v)
 }
 
 func gobytes(p unsafe.Pointer, n int) []byte {

@@ -2,15 +2,15 @@
 
 
 [[projects]]
-  digest = "1:2808029508f87e5e58aff55eff126e9a02a79951db52fa994883ee1825d48469"
+  branch = "master"
+  digest = "1:ed58df6981a550d5f77a75a44f5371a197cafb18d3148c54d5a69386ad142533"
   name = "github.com/blackjack/webcam"
   packages = [
     ".",
     "ioctl",
   ]
   pruneopts = "UT"
-  revision = "dba29cd98b67338ba06da65a102550592eed5426"
-  version = "v0.3"
+  revision = "c9c96d5fa89f2ad019e1fdbf9833207459623a51"
 
 [[projects]]
   branch = "master"
