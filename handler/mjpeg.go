@@ -38,15 +38,20 @@ func (s *MJPEGStream) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Println("Stream:", r.RemoteAddr, "connected - video FPS:", fps)
-	c := time.Tick(time.Second / time.Duration(fps))
-	for range c {
-		_, err := w.Write(s.frame)
-		if err != nil {
-			break
+	ticker := time.NewTicker(time.Second / time.Duration(fps))
+	defer ticker.Stop()
+	for {
+		select {
+		case <-ticker.C:
+			_, err := w.Write(s.frame)
+			if err != nil {
+				break
+			}
+		case <-r.Context().Done():
+			log.Println("Stream:", r.RemoteAddr, "disconnected")
+			return
 		}
 	}
-
-	log.Println("Stream:", r.RemoteAddr, "disconnected")
 }
 
 // UpdateJPEG set the current jpeg frame
