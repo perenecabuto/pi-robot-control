@@ -20,19 +20,19 @@ LDFLAGS := "-L$(LIBJPEG_DIR)/lib -Wl,-rpath=\$$ORIGIN/vendor/libjpeg/lib/ -O3"
 remote = @ssh $(USER)@$(HOST)
 
 .PHONY=build
-build: libjpeg_x86 install_libjpeg
+build: libjpeg-x86 install-libjpeg
 	CGO_ENABLED=1 GOOS=linux CGO_CFLAGS=$(CFLAGS) CGO_LDFLAGS=$(LDFLAGS) go build -v
 
 .PHONY=test
 test:
 	CompileDaemon -color -command "go test ./..."
 
-.PHONY=cross_arm
-cross_arm:
+.PHONY=cross-arm
+cross-arm:
 	CGO_ENABLED=1 CC=$(ARM_COMPILER) CGO_CFLAGS=$(CFLAGS) CGO_LDFLAGS=$(LDFLAGS) GOOS=linux GOARCH=arm go build
 
 .PHONY=deploy upload
-deploy: cross_arm upload
+deploy: cross-arm upload
 	@echo Deployed to $(HOST)
 
 upload:
@@ -53,28 +53,29 @@ start: stop
 .PHONY=remote-deps
 remote-deps:
 	$(remote) sudo aptitude install -y i2c-tools
+	$(remote) sudo aptitude install -y libjpeg9-dev
 
 .PHONY=deps
 deps:
 	sudo aptitude install -y gccgo-arm-linux-gnueabi
 
-.PHONY=libjpeg_arm
-libjpeg_arm: download_libjpeg
+.PHONY=libjpeg-arm
+libjpeg-arm: download-libjpeg
 	cd $(VENDOR_DIR)/$(LIBJPEG_SRC_NAME) && ./configure --host=arm-linux CC=$(ARM_COMPILER)
 	cd $(VENDOR_DIR)/$(LIBJPEG_SRC_NAME) && make clean install DESTDIR=`pwd`
 
-.PHONY=libjpeg_x86
-libjpeg_x86: download_libjpeg
+.PHONY=libjpeg-x86
+libjpeg-x86: download-libjpeg
 	cd $(VENDOR_DIR)/$(LIBJPEG_SRC_NAME) && ./configure
 	cd $(VENDOR_DIR)/$(LIBJPEG_SRC_NAME) && make clean install DESTDIR=`pwd`
 
-.PHONY=install_libjpeg
-install_libjpeg:
+.PHONY=install-libjpeg
+install-libjpeg:
 	cd $(VENDOR_DIR)/$(LIBJPEG_SRC_NAME) && cp -r $(LIBJPEG_INSTALL_DIR)/include/ $(LIBJPEG_DIR)
 	cd $(VENDOR_DIR)/$(LIBJPEG_SRC_NAME) && cp -r $(LIBJPEG_INSTALL_DIR)/lib*/ $(LIBJPEG_DIR)/lib/
 
-.PHONY=download_libjpeg
-download_libjpeg:
+.PHONY=download-libjpeg
+download-libjpeg:
 	mkdir -p $(LIBJPEG_DIR)
 	cd $(VENDOR_DIR)  && wget -c $(LIBJPEG_SRC_URL)
 	cd $(VENDOR_DIR)  && tar -xzf $(LIBJPEG_SRC_TGZ)
