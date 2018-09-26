@@ -10,7 +10,8 @@ import (
 
 // CompassPayload represents the compass message
 type CompassPayload struct {
-	Direction device.Direction `json:"direction"`
+	Direction string `json:"direction"`
+	Degress   int    `json:"degress"`
 	X, Y, Z   int
 }
 
@@ -27,17 +28,15 @@ func NewCompassHandler(c device.Compass) *CompassHandler {
 func (h CompassHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	data, err := h.compass.Read()
 	if err != nil {
-		log.Println(err)
-		http.Error(w, err.Error(), 500)
+		log.Println("[CompassHandler] Error to read compass:", err.Error())
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	payload := &CompassPayload{device.North, data.X, data.Y, data.Z}
-	if resp, err := json.Marshal(payload); err == nil {
-		w.Header().Set("Content-Type", "application/json")
-		if i, err := w.Write(resp); err != nil {
-			log.Println("Error - writen(", i, ")", err)
-		}
-	} else {
-		http.Error(w, err.Error(), 500)
+	w.Header().Set("Content-Type", "application/json")
+	payload := &CompassPayload{string(data.Direction), data.Degress, data.X, data.Y, data.Z}
+	resp, _ := json.Marshal(payload)
+	if _, err := w.Write(resp); err != nil {
+		log.Println("[CompassHandler] Error to write compass payload:", err.Error())
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
